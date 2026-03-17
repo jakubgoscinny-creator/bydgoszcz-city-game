@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amy's Bydgoszcz Family Quest</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./standalone/app.css" />
+  </head>
+  <body>
+    <noscript>
+      <div class="noscript-card">
+        This trail needs JavaScript turned on so the route, memories, and stop-switching can work.
+      </div>
+    </noscript>
+
+    <main class="app-shell" id="top">
+      <header class="app-chrome">
+        <a class="chrome-brand" href="#top">
+          <span class="chrome-crest" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          <span class="chrome-brand-copy">
+            <small>Bydgoszcz City Game</small>
+            <strong>Amy's Family Quest</strong>
+          </span>
+        </a>
+
+        <div class="chrome-pulse">
+          <span class="chrome-progress" id="chrome-progress">Stop 1 of 10</span>
+          <strong id="chrome-stop-name">Old Market Square &amp; Cathedral</strong>
+        </div>
+
+        <button
+          class="hamburger-button"
+          id="menu-button"
+          type="button"
+          aria-controls="menu-drawer"
+          aria-expanded="false"
+        >
+          <span class="hamburger-lines" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          <span>Menu</span>
+        </button>
+      </header>
+
+      <div class="menu-overlay" id="menu-overlay" hidden></div>
+
+      <aside class="menu-drawer" id="menu-drawer" aria-hidden="true">
+        <div class="menu-drawer-header">
+          <div>
+            <p class="kicker">Trail Navigation</p>
+            <h2>Jump around without losing the story</h2>
+          </div>
+          <button class="ghost-button compact-button menu-close-button" id="menu-close-button" type="button">Close</button>
+        </div>
+
+        <p class="menu-drawer-copy">
+          Use this like a family route passport: reopen any checkpoint, jump to breaks, or head
+          straight to the memory keepsake at the end.
+        </p>
+
+        <div class="menu-shortcuts">
+          <a class="menu-shortcut is-primary" href="#explore-route" data-menu-section="explore-route">Current checkpoint</a>
+          <a class="menu-shortcut" href="#pause-shortlist" data-menu-section="pause-shortlist">Pause ideas</a>
+          <a class="menu-shortcut" href="#memory-pack" data-menu-section="memory-pack">Keepsake</a>
+        </div>
+
+        <div class="menu-metrics" id="menu-metrics"></div>
+        <div class="menu-route" id="menu-route"></div>
+      </aside>
+
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <p class="kicker">Bydgoszcz City Game</p>
+          <h1>Amy's Bydgoszcz Family Quest</h1>
+          <p class="hero-intro">
+            A blue-white-red walking adventure through the old heart of Bydgoszcz:
+            squares, mills, bridges, parks, music, ice cream, and little memory
+            checkpoints for the whole family.
+          </p>
+
+          <div class="badge-row">
+            <span class="badge badge-blue">2.5 to 3 hours with pauses</span>
+            <span class="badge badge-white">About 3.5 km</span>
+            <span class="badge badge-red">Friendly for ages 4+</span>
+          </div>
+
+          <div class="hero-actions">
+            <a class="primary-link" href="#explore-route">Open the city quest</a>
+            <a class="secondary-link" href="#memory-pack">Jump to the keepsake</a>
+          </div>
+
+          <div class="brand-band">
+            <article class="brand-pill">
+              <span class="brand-dot is-blue"></span>
+              <div>
+                <strong>Blue river city</strong>
+                <p>Brda water, island views, and bridge moments keep the route moving.</p>
+              </div>
+            </article>
+            <article class="brand-pill">
+              <span class="brand-dot is-white"></span>
+              <div>
+                <strong>White civic heart</strong>
+                <p>Squares, facades, and park promenades give the walk a ceremonial feel.</p>
+              </div>
+            </article>
+            <article class="brand-pill">
+              <span class="brand-dot is-red"></span>
+              <div>
+                <strong>Red brick story</strong>
+                <p>Mills, cathedrals, and music-quarter architecture make the city unmistakable.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="atlas-panel">
+          <div class="atlas-heading">
+            <div>
+              <p class="hero-card-label">City Atlas</p>
+              <h2>Old Square to Philharmonic Hall</h2>
+            </div>
+            <p class="atlas-copy">
+              A real central-Bydgoszcz route view, so the family can understand the shape of the
+              walk straight away before opening each checkpoint like a little passport stamp.
+            </p>
+          </div>
+
+          <div class="atlas-map" id="city-map"></div>
+
+          <div class="atlas-notes">
+            <article class="metric-card">
+              <strong>10</strong>
+              <span>family checkpoints</span>
+            </article>
+            <article class="metric-card">
+              <strong>5</strong>
+              <span>planned pause ideas</span>
+            </article>
+            <article class="metric-card">
+              <strong>1</strong>
+              <span>downloadable memory pack</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="memory-banner">
+        <div>
+          <p class="kicker">Trail Rhythm</p>
+          <h2>Capture the walk as it happens</h2>
+          <p class="section-copy">
+            Ratings, short notes, and small photos stay in this browser so you can turn the day
+            into a keepsake at the end of the route.
+          </p>
+        </div>
+        <div class="banner-metrics" id="banner-metrics"></div>
+      </section>
+
+      <section class="experience-grid" id="explore-route">
+        <aside class="route-rail">
+          <div class="rail-top">
+            <p class="rail-label">Route passport</p>
+            <div class="progress-ring" id="progress-ring" aria-label="Route progress">
+              <div class="progress-ring-track" id="progress-ring-track">
+                <strong id="progress-value">1 / 10</strong>
+                <span>checkpoints opened</span>
+              </div>
+            </div>
+          </div>
+          <div class="rail-list" id="rail-list"></div>
+        </aside>
+
+        <section class="stop-stage">
+          <div class="stage-heading">
+            <div>
+              <p class="kicker" id="stop-kicker">Stop 1</p>
+              <h2 id="stop-name">Old Market Square &amp; Cathedral</h2>
+            </div>
+            <div class="time-pill-group">
+              <span class="time-pill" id="walk-pill">Start here</span>
+              <span class="time-pill" id="stay-pill">18-22 min</span>
+            </div>
+          </div>
+
+          <div class="stage-tags">
+            <span class="route-chip" id="district-chip">Old Town start</span>
+            <span class="route-chip route-chip-strong" id="signature-chip">Wizards and meridian</span>
+          </div>
+
+          <figure class="photo-card stage-photo-card">
+            <img id="stop-image" alt="" loading="lazy" />
+            <figcaption id="stop-image-caption"></figcaption>
+          </figure>
+
+          <div class="stage-grid">
+            <div class="story-column">
+              <p class="stop-strapline" id="stop-strapline"></p>
+              <ul class="look-for-list" id="look-for-list"></ul>
+              <div class="fact-intro-card" id="fact-intro-card"></div>
+              <div class="fact-grid" id="fact-grid"></div>
+              <div class="deep-dive-slot" id="deep-dive-slot"></div>
+              <div class="treat-slot" id="treat-slot"></div>
+
+              <div class="action-row">
+                <a class="primary-link" id="open-map-link" href="#" target="_blank" rel="noreferrer">Open this stop in Google Maps</a>
+                <a class="secondary-link" id="directions-link" href="#" target="_blank" rel="noreferrer">Take us to the next stop</a>
+              </div>
+
+              <section class="checkpoint-card" id="checkpoint-passport">
+                <div class="checkpoint-heading">
+                  <div>
+                    <p class="fact-label">Checkpoint passport</p>
+                    <h3 class="checkpoint-title">Stamp this stop in a few taps</h3>
+                  </div>
+                  <span class="memory-status" id="memory-status">Nothing saved for this stop yet</span>
+                </div>
+
+                <p class="checkpoint-copy" id="memory-prompt"></p>
+
+                <div class="rating-row" id="rating-row"></div>
+                <div class="memory-mini-row" id="memory-mini-row"></div>
+
+                <details class="memory-drawer" id="memory-drawer">
+                  <summary>
+                    <span id="memory-drawer-title">Optional: add a note or photo</span>
+                    <small id="memory-drawer-copy">Keep one tiny detail for the end-of-walk keepsake.</small>
+                  </summary>
+
+                  <div class="memory-drawer-body">
+                    <label class="memory-field">
+                      <span>Short memory</span>
+                      <textarea
+                        id="memory-note"
+                        rows="4"
+                        maxlength="280"
+                        placeholder="What did you notice, laugh about, or want to remember here?"
+                      ></textarea>
+                    </label>
+
+                    <label class="upload-field">
+                      <span>Add a photo for the final keepsake</span>
+                      <input id="memory-photo" type="file" accept="image/*" />
+                    </label>
+
+                    <div class="photo-preview" id="photo-preview"></div>
+
+                    <div class="checkpoint-actions">
+                      <button class="ghost-button compact-button" id="clear-memory-button" type="button">Clear this checkpoint</button>
+                    </div>
+                  </div>
+                </details>
+              </section>
+
+              <div class="button-row">
+                <button class="ghost-button" id="prev-button" type="button">Previous stop</button>
+                <button class="ghost-button" id="next-button" type="button">Next stop</button>
+              </div>
+
+              <a class="source-link" id="source-link" href="#" target="_blank" rel="noreferrer"></a>
+            </div>
+
+            <div class="visual-column">
+              <div class="map-card">
+                <div class="map-card-header">
+                  <div>
+                    <p class="fact-label">Live map hand-off</p>
+                    <span id="map-next-label">Next checkpoint</span>
+                  </div>
+                  <span class="map-hint">Tap out to walking directions whenever the family is ready.</span>
+                </div>
+                <iframe class="map-frame" id="map-frame" loading="lazy" title="Map for current stop"></iframe>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="overview-panel">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">Whole Route</p>
+            <h2>All checkpoints at a glance</h2>
+          </div>
+          <p class="section-copy">
+            Skip ahead if the family wants a shorter version, or jump back to any place where a
+            favorite memory starts to form.
+          </p>
+        </div>
+        <div class="overview-grid" id="overview-grid"></div>
+      </section>
+
+      <section class="pause-panel" id="pause-shortlist">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">Pause Shortlist</p>
+            <h2>Treats, coffee, and soft reset moments</h2>
+          </div>
+          <p class="section-copy">
+            These are the route pauses worth keeping in the mix right now. You can still curate the
+            final July rhythm later once you know the family's appetite and energy.
+          </p>
+        </div>
+        <div class="pause-grid" id="pause-grid"></div>
+      </section>
+
+      <section class="memory-panel" id="memory-pack">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">Family Keepsake</p>
+            <h2>Turn the walk into a little memory archive</h2>
+          </div>
+          <p class="section-copy">
+            When the trail is finished, this area becomes the handoff point for a future postcard,
+            album, slideshow, or even a later Podio-style storage flow.
+          </p>
+        </div>
+
+        <div class="memory-summary">
+          <article class="keepsake-card" id="keepsake-card"></article>
+          <div class="memory-list" id="memory-list"></div>
+        </div>
+
+        <div class="memory-export-row">
+          <button class="primary-link as-button" id="download-memory-button" type="button">Download memory pack</button>
+          <button class="secondary-link as-button" id="download-postcard-button" type="button">Download postcard note</button>
+          <button class="ghost-button" id="reset-memories-button" type="button">Reset saved memories</button>
+        </div>
+      </section>
+
+      <footer class="project-note">
+        <p>
+          Route facts are anchored in the official Bydgoszcz tourism portal plus your named local
+          picks. Memory notes, ratings, and uploaded images stay in this browser unless you export
+          them.
+        </p>
+      </footer>
+    </main>
+
+    <script src="./standalone/app.js"></script>
+  </body>
+</html>

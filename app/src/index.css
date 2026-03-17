@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --display-font: 'Instrument Serif', serif;
+  --body-font: 'Syne', sans-serif;
+  --deep-river: #174f54;
+  --river: #2e7478;
+  --foam: #dff3f0;
+  --paper: #f8f0e4;
+  --surface: rgba(250, 246, 239, 0.82);
+  --line: rgba(24, 61, 67, 0.12);
+  --ink: #1a211f;
+  --muted: #5f6964;
+  --copper: #b6764d;
+  --shadow-soft: 0 1.5rem 3.5rem rgba(18, 46, 50, 0.12);
+
+  font-family: var(--body-font);
+  line-height: 1.55;
+  font-weight: 500;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(203, 234, 230, 0.9), transparent 22%),
+    radial-gradient(circle at top right, rgba(243, 214, 183, 0.85), transparent 18%),
+    linear-gradient(180deg, #eef6f4 0%, #f7f0e5 52%, #eff7f6 100%);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.18) 50%, transparent 100%),
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.22), transparent 28%);
+  opacity: 0.75;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+}
+
+#root {
+  min-height: 100vh;
+}
