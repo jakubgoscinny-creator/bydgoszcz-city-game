@@ -1,0 +1,352 @@
+﻿<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rodzinny Spacer po Bydgoszczy — Bydgoszcz City Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./standalone/app.css" />
+  </head>
+  <body>
+    <noscript>
+      <div class="noscript-card">
+        Ta trasa wymaga JavaScriptu, aby działało przechodzenie między punktami, zapisywanie wspomnień i
+        aktywne liczniki.
+      </div>
+    </noscript>
+
+    <main class="app-shell" id="top">
+      <header class="app-chrome">
+        <a class="chrome-brand" href="#top">
+          <span class="chrome-crest" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          <span class="chrome-brand-copy">
+            <small>Bydgoszcz City Game</small>
+            <strong>Rodzinny Spacer</strong>
+          </span>
+        </a>
+
+        <div class="chrome-pulse">
+          <span class="chrome-progress" id="chrome-progress">Stop 1 z 10</span>
+          <strong id="chrome-stop-name">Stary Rynek i Katedra</strong>
+        </div>
+
+        <button
+          class="hamburger-button"
+          id="menu-button"
+          type="button"
+          aria-controls="menu-drawer"
+          aria-expanded="false"
+        >
+          <span class="hamburger-lines" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          <span>Menu</span>
+        </button>
+      </header>
+
+      <div class="menu-overlay" id="menu-overlay" hidden></div>
+
+      <aside class="menu-drawer" id="menu-drawer" aria-hidden="true">
+        <div class="menu-drawer-header">
+          <div>
+            <p class="kicker">Nawigacja trasy</p>
+            <h2>Przechodź między punktami bez gubienia historii</h2>
+          </div>
+          <button class="ghost-button compact-button menu-close-button" id="menu-close-button" type="button">Zamknij</button>
+        </div>
+
+        <p class="menu-drawer-copy">
+          Traktuj to jak rodzinny paszport trasy: wracaj do dowolnego punktu, skacz do przerw lub od razu do
+          pamiątki na końcu.
+        </p>
+
+        <div class="menu-shortcuts">
+          <a class="menu-shortcut is-primary" href="#explore-route" data-menu-section="explore-route">Bieżący punkt</a>
+          <a class="menu-shortcut" href="#pause-shortlist" data-menu-section="pause-shortlist">Przerwy</a>
+          <a class="menu-shortcut" href="#memory-pack" data-menu-section="memory-pack">Pamiątki</a>
+        </div>
+
+        <div class="menu-metrics" id="menu-metrics"></div>
+        <div class="menu-route" id="menu-route"></div>
+      </aside>
+
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <p class="kicker">Bydgoszcz City Game</p>
+          <h1>Rodzinny spacer po Bydgoszczy</h1>
+          <p class="hero-intro">
+            Błękitno-biało-czerwona wyprawa piesza przez stare centrum Bydgoszczy:
+            place, młyny, mosty, parki, muzykę, lody i małe punkty pamięci dla całej rodziny.
+          </p>
+
+          <div class="badge-row">
+            <span class="badge badge-blue">2,5–3 godziny z przerwami</span>
+            <span class="badge badge-white">Około 3,5 km</span>
+            <span class="badge badge-red">Przyjazne od 4 lat</span>
+          </div>
+
+          <div class="hero-actions">
+            <a class="primary-link" href="#explore-route">Otwórz trasę</a>
+            <a class="secondary-link" href="#memory-pack">Przejdź do pamiątki</a>
+          </div>
+
+          <div class="brand-band">
+            <article class="brand-pill">
+              <span class="brand-dot is-blue"></span>
+              <div>
+                <strong>Błękitna rzeka</strong>
+                <p>Brda, wysepki i mosty podtrzymują rytm trasy.</p>
+              </div>
+            </article>
+            <article class="brand-pill">
+              <span class="brand-dot is-white"></span>
+              <div>
+                <strong>Biały śródmiejski rytm</strong>
+                <p>Place i deptaki nadają spacerowi ceremonialny charakter.</p>
+              </div>
+            </article>
+            <article class="brand-pill">
+              <span class="brand-dot is-red"></span>
+              <div>
+                <strong>Czerwona cegła</strong>
+                <p>Młyny, katedra i muzyczny kwartał tworzą rozpoznawalny klimat miasta.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="atlas-panel">
+          <div class="atlas-heading">
+            <div>
+              <p class="hero-card-label">Atlas miasta</p>
+              <h2>Od Rynku do Filharmonii</h2>
+            </div>
+            <p class="atlas-copy">
+              Rzeczywista mapa śródmieścia, dzięki której całą rodzinę od razu wprowadzasz w kształt trasy,
+              a kolejne punkty odblokowujesz jak stempel w paszporcie.
+            </p>
+          </div>
+
+          <div class="atlas-map" id="city-map"></div>
+
+          <div class="atlas-notes">
+            <article class="metric-card">
+              <strong>10</strong>
+              <span>punktów trasy</span>
+            </article>
+            <article class="metric-card">
+              <strong>5</strong>
+              <span>propozycji przerw</span>
+            </article>
+            <article class="metric-card">
+              <strong>1</strong>
+              <span>pobieralna pamiątka</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="memory-banner">
+        <div>
+          <p class="kicker">Rytm wycieczki</p>
+          <h2>Zbieraj wrażenia na bieżąco</h2>
+          <p class="section-copy">
+            Oceny, krótkie notatki i zdjęcia zostają w przeglądarce, a na końcu tworzą rodzinną pamiątkę.
+          </p>
+        </div>
+        <div class="banner-metrics" id="banner-metrics"></div>
+      </section>
+
+      <section class="experience-grid" id="explore-route">
+        <aside class="route-rail">
+          <div class="rail-top">
+            <p class="rail-label">Paszport trasy</p>
+            <div class="progress-ring" id="progress-ring" aria-label="Postęp trasy">
+              <div class="progress-ring-track" id="progress-ring-track">
+                <strong id="progress-value">1 / 10</strong>
+                <span>odblokowane punkty</span>
+              </div>
+            </div>
+          </div>
+          <div class="rail-list" id="rail-list"></div>
+        </aside>
+
+        <section class="stop-stage">
+          <div class="stage-heading">
+            <div>
+              <p class="kicker" id="stop-kicker">Stop 1</p>
+              <h2 id="stop-name">Stary Rynek i Katedra</h2>
+            </div>
+            <div class="time-pill-group">
+              <span class="time-pill" id="walk-pill">Start tutaj</span>
+              <span class="time-pill" id="stay-pill">18-22 min</span>
+            </div>
+          </div>
+
+          <div class="stage-tags">
+            <span class="route-chip" id="district-chip">Start starego miasta</span>
+            <span class="route-chip route-chip-strong" id="signature-chip">Czarodzieje i meridian</span>
+          </div>
+
+          <figure class="photo-card stage-photo-card">
+            <img id="stop-image" alt="" loading="lazy" />
+            <figcaption id="stop-image-caption"></figcaption>
+          </figure>
+
+          <div class="stage-grid">
+            <div class="story-column">
+              <p class="stop-strapline" id="stop-strapline"></p>
+              <ul class="look-for-list" id="look-for-list"></ul>
+              <div class="fact-intro-card" id="fact-intro-card"></div>
+              <div class="fact-grid" id="fact-grid"></div>
+              <div class="deep-dive-slot" id="deep-dive-slot"></div>
+              <div class="treat-slot" id="treat-slot"></div>
+
+              <div class="action-row">
+                <a class="primary-link" id="open-map-link" href="#" target="_blank" rel="noreferrer">Otwórz ten punkt w Google Maps</a>
+                <a class="secondary-link" id="directions-link" href="#" target="_blank" rel="noreferrer">Pokaż trasę do następnego punktu</a>
+              </div>
+
+              <section class="checkpoint-card" id="checkpoint-passport">
+                <div class="checkpoint-heading">
+                  <div>
+                    <p class="fact-label">Stempel punktu</p>
+                    <h3 class="checkpoint-title">Oznacz ten punkt kilkoma stuknięciami</h3>
+                  </div>
+                  <span class="memory-status" id="memory-status">Jeszcze nic nie zapisano dla tego punktu</span>
+                </div>
+
+                <p class="checkpoint-copy" id="memory-prompt"></p>
+
+                <div class="rating-row" id="rating-row"></div>
+                <div class="memory-mini-row" id="memory-mini-row"></div>
+
+                <details class="memory-drawer" id="memory-drawer">
+                  <summary>
+                    <span id="memory-drawer-title">Opcjonalnie: dodaj notatkę lub zdjęcie</span>
+                    <small id="memory-drawer-copy">Zachowaj jeden mały szczegół na końcowy albumik wspomnień.</small>
+                  </summary>
+
+                  <div class="memory-drawer-body">
+                    <label class="memory-field">
+                      <span>Krótka notatka</span>
+                      <textarea
+                        id="memory-note"
+                        rows="4"
+                        maxlength="280"
+                        placeholder="Co dziś was najbardziej rozbawiło, zaskoczyło albo zachwyciło?"
+                      ></textarea>
+                    </label>
+
+                    <label class="upload-field">
+                      <span>Dodaj zdjęcie do końcowej pamiątki</span>
+                      <input id="memory-photo" type="file" accept="image/*" />
+                    </label>
+
+                    <div class="photo-preview" id="photo-preview"></div>
+
+                    <div class="checkpoint-actions">
+                      <button class="ghost-button compact-button" id="clear-memory-button" type="button">Wyczyść punkt</button>
+                    </div>
+                  </div>
+                </details>
+              </section>
+
+              <div class="button-row">
+                <button class="ghost-button" id="prev-button" type="button">Poprzedni punkt</button>
+                <button class="ghost-button" id="next-button" type="button">Następny punkt</button>
+              </div>
+
+              <a class="source-link" id="source-link" href="#" target="_blank" rel="noreferrer"></a>
+            </div>
+
+            <div class="visual-column">
+              <div class="map-card">
+                <div class="map-card-header">
+                  <div>
+                    <p class="fact-label">Podgląd mapy</p>
+                    <span id="map-next-label">Następny punkt</span>
+                  </div>
+                  <span class="map-hint">Kliknij, aby uruchomić nawigację pieszą, gdy rodzina będzie gotowa.</span>
+                </div>
+                <iframe class="map-frame" id="map-frame" loading="lazy" title="Mapa bieżącego punktu"></iframe>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="overview-panel">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">Cała trasa</p>
+            <h2>Wszystkie punkty jedną chwilą</h2>
+          </div>
+          <p class="section-copy">
+            Jeśli chcecie krótszy wariant, przeskoczcie od razu; wróćcie też do każdego punktu, w którym tworzy
+            się ulubione wspomnienie.
+          </p>
+        </div>
+        <div class="overview-grid" id="overview-grid"></div>
+      </section>
+
+      <section class="pause-panel" id="pause-shortlist">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">Lista przerw</p>
+            <h2>Desery, kawa i chwile resetu</h2>
+          </div>
+          <p class="section-copy">
+            To propozycje przerw, które najlepiej trzymają energię rodziny. Ostateczny rytm i kolejność możecie
+            dopasować na bieżąco.
+          </p>
+        </div>
+        <div class="pause-grid" id="pause-grid"></div>
+      </section>
+
+      <section class="memory-panel" id="memory-pack">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">Pamiątki rodzinne</p>
+            <h2>Utwórz domową archiwizację spaceru</h2>
+          </div>
+          <p class="section-copy">
+            Po zakończeniu trasy ten obszar to punkt wyjścia do pocztówki, albumu, slajdów albo dalszej
+            dygresji do archiwum.
+          </p>
+        </div>
+
+        <div class="memory-summary">
+          <article class="keepsake-card" id="keepsake-card"></article>
+          <div class="memory-list" id="memory-list"></div>
+        </div>
+
+        <div class="memory-export-row">
+          <button class="primary-link as-button" id="download-memory-button" type="button">Pobierz pakiet pamiątek</button>
+          <button class="secondary-link as-button" id="download-postcard-button" type="button">Pobierz notatkę pocztówkową</button>
+          <button class="ghost-button" id="reset-memories-button" type="button">Wyczyść zapisane wspomnienia</button>
+        </div>
+      </section>
+
+      <footer class="project-note">
+        <p>
+          Fakty trasy pochodzą z oficjalnego portalu turystycznego Bydgoszczy i Twoich ulubionych miejsc.
+          Notatki, oceny i zdjęcia zostają tylko w tej przeglądarce, dopóki ich nie wyeksportujesz.
+        </p>
+      </footer>
+    </main>
+
+    <script src="./standalone/app-pl.js"></script>
+  </body>
+</html>
