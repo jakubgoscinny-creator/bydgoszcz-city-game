@@ -1,77 +1,188 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700;800&display=swap');
+/* ═══════════════════════════════════════════════════════════════
+   Amy's Bydgoszcz Treasure Trail — "Amber on the Brda"
+   Warm field-journal editorial. Bydgoszcz blue / white / red,
+   with amber reserved exclusively for the family's marks.
+   Fonts are self-hosted (Fontsource) — no network font dependency.
+   ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  --display-font: 'Instrument Serif', serif;
-  --body-font: 'Syne', sans-serif;
-  --deep-river: #174f54;
-  --river: #2e7478;
-  --foam: #dff3f0;
-  --paper: #f8f0e4;
-  --surface: rgba(250, 246, 239, 0.82);
-  --line: rgba(24, 61, 67, 0.12);
-  --ink: #1a211f;
-  --muted: #5f6964;
-  --copper: #b6764d;
-  --shadow-soft: 0 1.5rem 3.5rem rgba(18, 46, 50, 0.12);
+  --display-font: 'Fraunces Variable', 'Fraunces', Georgia, serif;
+  --body-font: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
 
-  font-family: var(--body-font);
-  line-height: 1.55;
-  font-weight: 500;
-  color: var(--ink);
-  background:
-    radial-gradient(circle at top left, rgba(203, 234, 230, 0.9), transparent 22%),
-    radial-gradient(circle at top right, rgba(243, 214, 183, 0.85), transparent 18%),
-    linear-gradient(180deg, #eef6f4 0%, #f7f0e5 52%, #eff7f6 100%);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Amber marks — constant across themes so the gesture reads as one thing */
+  --amber: #d9962b;
+  --amber-deep: #b06f14;
+  --amber-glow: rgba(217, 150, 43, 0.35);
+  --dot-ring: var(--amber); /* overridden per-theme where contrast demands */
 }
 
-*,
-*::before,
-*::after {
+:root,
+[data-theme='day'] {
+  color-scheme: light;
+
+  --paper: #f7f1e4;
+  --paper-raised: #fffdf6;
+  --ink: #1b2b4d;
+  --ink-soft: #45557a;
+  --muted: #5c6684; /* ≥4.5:1 on paper */
+  --dot-ring: #a8690f; /* amber ring needs ≥3:1 on light paper */
+  --line: rgba(27, 43, 77, 0.14);
+  --line-strong: rgba(27, 43, 77, 0.28);
+
+  --city-blue: #1c4b9b;
+  --city-blue-deep: #14315f;
+  --city-red: #b3252d;
+  --city-red-soft: rgba(179, 37, 45, 0.09);
+  --foam: #e7eef8;
+
+  --chrome-bg: rgba(247, 241, 228, 0.88);
+  --card-shadow: 0 1rem 2.4rem rgba(20, 49, 95, 0.1);
+  --veil: linear-gradient(180deg, rgba(20, 49, 95, 0) 30%, rgba(20, 49, 95, 0.55));
+
+  --body-bg:
+    radial-gradient(circle at 12% -4%, rgba(28, 75, 155, 0.08), transparent 34%),
+    radial-gradient(circle at 88% 0%, rgba(179, 37, 45, 0.06), transparent 30%),
+    linear-gradient(180deg, #f3ecdd 0%, #f7f1e4 45%, #f2ecdf 100%);
+
+  --button-bg: var(--city-blue-deep);
+  --button-ink: #f7f1e4;
+  --ghost-border: rgba(27, 43, 77, 0.25);
+}
+
+[data-theme='dusk'] {
+  color-scheme: dark;
+
+  --paper: #232441;
+  --paper-raised: #2c2d4f;
+  --ink: #efe4cf;
+  --ink-soft: #cbbfa8;
+  --muted: #9d94a8;
+  --line: rgba(239, 228, 207, 0.14);
+  --line-strong: rgba(239, 228, 207, 0.3);
+
+  --city-blue: #8fb2e8;
+  --city-blue-deep: #b9d0f2;
+  --city-red: #e88d84;
+  --city-red-soft: rgba(232, 141, 132, 0.12);
+  --foam: #2d3253;
+
+  --chrome-bg: rgba(35, 36, 65, 0.9);
+  --card-shadow: 0 1rem 2.4rem rgba(8, 8, 24, 0.45);
+  --veil: linear-gradient(180deg, rgba(10, 10, 30, 0) 30%, rgba(10, 10, 30, 0.66));
+
+  --body-bg:
+    radial-gradient(circle at 15% -6%, rgba(217, 150, 43, 0.14), transparent 36%),
+    radial-gradient(circle at 90% 4%, rgba(179, 37, 45, 0.12), transparent 34%),
+    linear-gradient(180deg, #1b1c36 0%, #232441 50%, #1d1e3a 100%);
+
+  --button-bg: #e5c98f;
+  --button-ink: #24180a;
+  --ghost-border: rgba(239, 228, 207, 0.3);
+}
+
+[data-theme='night'] {
+  color-scheme: dark;
+
+  --paper: #0e1626;
+  --paper-raised: #172134;
+  --ink: #dbe4f2;
+  --ink-soft: #a9b8d4;
+  --muted: #7d8aa5;
+  --line: rgba(219, 228, 242, 0.12);
+  --line-strong: rgba(219, 228, 242, 0.28);
+
+  --city-blue: #7ea8e6;
+  --city-blue-deep: #a9c6ef;
+  --city-red: #e0736d;
+  --city-red-soft: rgba(224, 115, 109, 0.1);
+  --foam: #1b2942;
+
+  --chrome-bg: rgba(14, 22, 38, 0.92);
+  --card-shadow: 0 1rem 2.4rem rgba(0, 0, 0, 0.55);
+  --veil: linear-gradient(180deg, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.7));
+
+  --body-bg:
+    radial-gradient(circle at 14% -4%, rgba(126, 168, 230, 0.1), transparent 32%),
+    radial-gradient(circle at 88% 2%, rgba(217, 150, 43, 0.08), transparent 30%),
+    linear-gradient(180deg, #0a111e 0%, #0e1626 55%, #0b1220 100%);
+
+  --button-bg: #dbe4f2;
+  --button-ink: #0e1626;
+  --ghost-border: rgba(219, 228, 242, 0.3);
+}
+
+* {
   box-sizing: border-box;
 }
 
 html {
-  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.18) 50%, transparent 100%),
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.22), transparent 28%);
-  opacity: 0.75;
-}
-
-button,
-a {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-a {
-  color: inherit;
-}
-
-img {
-  max-width: 100%;
+  min-height: 100dvh;
+  font-family: var(--body-font);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--body-bg);
+  background-attachment: fixed;
+  transition: background 400ms ease, color 400ms ease;
+  overscroll-behavior-x: none;
 }
 
 #root {
-  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--display-font);
+  font-weight: 560;
+  line-height: 1.14;
+  margin: 0;
+  color: var(--ink);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--city-blue);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Every interactive surface: kill double-tap-to-zoom so it never fights the
+   app's own double-tap-to-heart. */
+a,
+button,
+input,
+textarea,
+select,
+[role='button'] {
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 2.5px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
