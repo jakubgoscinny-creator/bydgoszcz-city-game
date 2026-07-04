@@ -1,17 +1,38 @@
 // "Download the day" — renders everything the family marked into one
 // self-contained HTML keepsake (photos embedded as data URLs), downloaded
 // locally. This is also the offline fallback if Supabase sync never happens.
+// gatherKeepsakeEntries() is shared with the live preview in KeepsakePanel so
+// the preview and the exported file can never drift apart.
 
 import { routeStops } from '../data/route'
 import { foodPlaces } from '../data/food'
+import { foodPhotos } from '../data/foodPhotos'
 import { polandTips } from '../data/tips'
-import { garbarySections } from '../data/garbary'
+import { garbarySections, garbaryPhoto } from '../data/garbary'
 import {
   getVisitorLabel,
   loadAllPhotos,
   loadAllReactions,
   loadAllVoiceNotes,
+  type ReactionState,
 } from './reactionsStore'
+
+export type KeepsakeEntry = {
+  contentId: string
+  order: number
+  updatedAt: number
+  title: string
+  detail: string
+  /** Bundled asset URL when the marked unit is itself one of the app's photos. */
+  imageSrc?: string
+  liked?: boolean
+  hearted?: boolean
+  note?: string
+  voiceId?: string
+  voiceDuration?: number
+  /** Set when the entry is a photo the family took (blob lives in IndexedDB). */
+  familyPhotoId?: string
+}
 
 const escapeHtml = (value: string) =>
   value
@@ -29,8 +50,13 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   })
 }
 
-/** Human title for a content id, walking the app's content in visit order. */
-function describeContentId(contentId: string): { order: number; title: string; detail: string } {
+/** Human title (and photo, where the unit is one) for a content id. */
+function describeContentId(contentId: string): {
+  order: number
+  title: string
+  detail: string
+  imageSrc?: string
+} {
   const parts = contentId.split(':')
   if (parts[0] === 'stop') {
     const stopIndex = routeStops.findIndex((s) => s.id === parts[1])
@@ -51,7 +77,11 @@ function describeContentId(contentId: string): { order: number; title: string; d
       if (parts[2] === 'adultFact') detail = stop.adultFacts[Number(parts[3] ?? 0)] ?? ''
       if (parts[2] === 'mission') detail = stop.mission
       if (parts[2] === 'bonus') detail = stop.bonus
-      return { order: stopIndex * 100, title: `${stop.name} — ${unit}`, detail }
+      let imageSrc: string | undefined
+      if (parts[2] === 'photo') {
+        imageSrc = parts[3] === '2' ? stop.secondPhoto?.url : stop.imageUrl
+      }
+      return { order: stopIndex * 100, title: `${stop.name} — ${unit}`, detail, imageSrc }
     }
   }
   if (parts[0] === 'pause') {
@@ -59,7 +89,12 @@ function describeContentId(contentId: string): { order: number; title: string; d
   }
   if (parts[0] === 'food') {
     const place = foodPlaces.find((f) => f.slug === parts[1])
-    return { order: 6000, title: `Food: ${place?.name ?? parts[1]}`, detail: place?.summary ?? '' }
+    return {
+      order: 6000,
+      title: `Food: ${place?.name ?? parts[1]}`,
+      detail: place?.summary ?? '',
+      imageSrc: parts[2] === 'photo' ? foodPhotos[parts[1]] : undefined,
+    }
   }
   if (parts[0] === 'tip') {
     const tip = polandTips.find((t) => t.slug === parts[1])
@@ -67,7 +102,7 @@ function describeContentId(contentId: string): { order: number; title: string; d
   }
   if (parts[0] === 'garbary') {
     if (parts[1] === 'chimney-photo') {
-      return { order: 8000, title: 'Garbary: the chimney photo', detail: '' }
+      return { order: 8000, title: 'Garbary: the chimney photo', detail: '', imageSrc: garbaryPhoto }
     }
     if (parts[1].endsWith('-photo')) {
       const section = garbarySections.find((s) => s.id === parts[1].replace(/-photo$/, ''))
@@ -75,6 +110,7 @@ function describeContentId(contentId: string): { order: number; title: string; d
         order: 8000,
         title: `Garbary: photo — ${section?.title ?? parts[1]}`,
         detail: '',
+        imageSrc: section?.photo?.src,
       }
     }
     const section = garbarySections.find((s) => s.id === parts[1])
@@ -86,16 +122,47 @@ function describeContentId(contentId: string): { order: number; title: string; d
   return { order: 9999, title: contentId, detail: '' }
 }
 
+/**
+ * Everything the family marked, in visit order — the single source of truth
+ * for both the live preview and the exported file.
+ */
+export function gatherKeepsakeEntries(reactions: ReactionState[]): KeepsakeEntry[] {
+  return reactions
+    .filter((r) => r.liked || r.hearted || (r.note && r.note.length > 0) || r.voiceId)
+    .map((r) => ({
+      contentId: r.contentId,
+      updatedAt: r.updatedAt,
+      liked: r.liked,
+      hearted: r.hearted,
+      note: r.note,
+      voiceId: r.voiceId,
+      voiceDuration: r.voiceDuration,
+      familyPhotoId: r.contentId.startsWith('familyPhoto:') ? r.contentId.split(':')[1] : undefined,
+      ...describeContentId(r.contentId),
+    }))
+    .sort((a, b) => a.order - b.order || a.updatedAt - b.updatedAt)
+}
+
+export const entryMarks = (entry: KeepsakeEntry): string =>
+  `${entry.liked ? '● ' : ''}${entry.hearted ? '♥ ' : ''}${entry.voiceId ? '🎙 ' : ''}`
+
+async function fetchAsDataUrl(url: string): Promise<string | null> {
+  try {
+    const response = await fetch(url)
+    if (!response.ok) return null
+    return await blobToDataUrl(await response.blob())
+  } catch {
+    return null
+  }
+}
+
 export async function downloadKeepsake(): Promise<void> {
   const [reactions, photos, voiceNotes] = await Promise.all([
     loadAllReactions(),
     loadAllPhotos(),
     loadAllVoiceNotes(),
   ])
-  const marked = reactions
-    .filter((r) => r.liked || r.hearted || (r.note && r.note.length > 0) || r.voiceId)
-    .map((r) => ({ ...r, ...describeContentId(r.contentId) }))
-    .sort((a, b) => a.order - b.order || a.updatedAt - b.updatedAt)
+  const marked = gatherKeepsakeEntries(reactions)
 
   const photoData = new Map<string, string>()
   for (const photo of photos.sort((a, b) => a.createdAt - b.createdAt)) {
@@ -115,6 +182,14 @@ export async function downloadKeepsake(): Promise<void> {
     }
   }
 
+  // Inline the app photos that marked entries point at (thumbnails must work
+  // offline, so bundled asset URLs become data URLs too).
+  const assetData = new Map<string, string>()
+  for (const src of new Set(marked.map((entry) => entry.imageSrc).filter(Boolean) as string[])) {
+    const data = await fetchAsDataUrl(src)
+    if (data) assetData.set(src, data)
+  }
+
   const visitor = getVisitorLabel()
   const dateLabel = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
@@ -125,28 +200,28 @@ export async function downloadKeepsake(): Promise<void> {
 
   const entries = marked
     .map((entry) => {
-      const isPhoto = entry.contentId.startsWith('familyPhoto:')
-      const photoId = isPhoto ? entry.contentId.split(':')[1] : null
-      const img = photoId && photoData.get(photoId)
-        ? `<img src="${photoData.get(photoId)}" alt="Family photo" />`
+      const familyImg = entry.familyPhotoId && photoData.get(entry.familyPhotoId)
+        ? `<img src="${photoData.get(entry.familyPhotoId)}" alt="Family photo" />`
+        : ''
+      const thumb = !familyImg && entry.imageSrc && assetData.get(entry.imageSrc)
+        ? `<img class="thumb" src="${assetData.get(entry.imageSrc)}" alt="" />`
         : ''
       const audio = entry.voiceId && voiceData.get(entry.voiceId)
         ? `<audio controls src="${voiceData.get(entry.voiceId)}"></audio>`
         : ''
       return `<section class="entry">
-        <h2>${entry.liked ? '● ' : ''}${entry.hearted ? '♥ ' : ''}${entry.voiceId ? '🎙 ' : ''}${escapeHtml(entry.title)}</h2>
+        <h2>${entryMarks(entry)}${escapeHtml(entry.title)}</h2>
         ${entry.detail ? `<p class="detail">${escapeHtml(entry.detail)}</p>` : ''}
         ${entry.note ? `<p class="note">“${escapeHtml(entry.note)}”</p>` : ''}
         ${audio}
-        ${img}
+        ${thumb}
+        ${familyImg}
       </section>`
     })
     .join('\n')
 
   const stampedPhotoIds = new Set(
-    marked
-      .filter((entry) => entry.contentId.startsWith('familyPhoto:'))
-      .map((entry) => entry.contentId.split(':')[1]),
+    marked.map((entry) => entry.familyPhotoId).filter(Boolean) as string[],
   )
   const extraPhotos = photos
     .filter((photo) => !stampedPhotoIds.has(photo.id))
@@ -173,6 +248,7 @@ export async function downloadKeepsake(): Promise<void> {
   .detail { margin: 0 0 0.4rem; font-size: 0.94rem; }
   .note { margin: 0.2rem 0; font-size: 1.05rem; font-style: italic; color: #52351f; }
   img { max-width: 100%; border-radius: 10px; margin-top: 0.6rem; }
+  img.thumb { max-height: 170px; width: auto; }
   audio { width: 100%; margin-top: 0.6rem; }
   .empty { font-style: italic; }
 </style></head>

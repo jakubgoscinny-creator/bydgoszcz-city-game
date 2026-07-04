@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { routeStops, mapSearchUrl } from '../data/route'
 import { foodPlaces } from '../data/food'
 import { polandTips } from '../data/tips'
@@ -14,7 +14,7 @@ import { foodPhotos } from '../data/foodPhotos'
 import { useReactions } from '../hooks/useReactions'
 import { ReactionDot } from './ReactionDot'
 import { StopPhoto } from './StopPhoto'
-import { downloadKeepsake } from '../lib/keepsake'
+import { downloadKeepsake, entryMarks, gatherKeepsakeEntries } from '../lib/keepsake'
 
 export type PanelId = 'howto' | 'tips' | 'garbary' | 'food' | 'keepsake' | null
 
@@ -81,9 +81,14 @@ const howItWorks = [
     body: "The mic beside the pencil records up to twenty seconds — a kid's reaction, the sound of the fountain, a verdict on the ice cream. Listen back, then keep it or toss it.",
   },
   {
+    emoji: '🧳',
+    title: 'In the menu',
+    body: 'The ☰ button up top holds the rest of the kit. "Good to know" — practical Poland tips for the week, from złoty maths to Sunday shop hours. "Your Street: Garbary" — the surprising history of the street you sleep on. "Where to eat" — real, checked places to refuel near the route. "Your keepsake" — everything you\'ve marked so far, gathered in one place.',
+  },
+  {
     emoji: '📔',
     title: 'The keepsake',
-    body: 'Everything you mark stays on this phone, even with no signal. Whenever you like, open the menu → "Your keepsake" → "Download the day" for one page holding the whole adventure.',
+    body: 'Everything you mark stays on this phone, even with no signal. "Your keepsake" in the menu shows the page growing as you walk — and "Download the day" saves it as one file holding the whole adventure.',
   },
 ]
 
@@ -249,12 +254,12 @@ function FoodCard({ place }: { place: (typeof foodPlaces)[number] }) {
 }
 
 export function KeepsakePanel({ onClose }: { onClose: () => void }) {
-  const { reactions, photos, visitorLabel, setVisitorLabel } = useReactions()
+  const { reactions, photos, photoUrls, voiceUrls, visitorLabel, setVisitorLabel } = useReactions()
   const [busy, setBusy] = useState(false)
   const [exportFailed, setExportFailed] = useState(false)
-  const markedCount = [...reactions.values()].filter(
-    (r) => r.liked || r.hearted || (r.note && r.note.length > 0),
-  ).length
+  // Same gathering logic as the exported file — preview and download can't drift.
+  const entries = useMemo(() => gatherKeepsakeEntries([...reactions.values()]), [reactions])
+  const markedCount = entries.length
 
   return (
     <Sheet title="Your keepsake" kicker="The day, as you marked it" onClose={onClose}>
@@ -285,6 +290,48 @@ export function KeepsakePanel({ onClose }: { onClose: () => void }) {
           <span>photos added</span>
         </div>
       </div>
+
+      <section className="keepsake-preview" aria-label="Keepsake preview">
+        <p className="keepsake-preview-label">The page so far</p>
+        {entries.length === 0 && photos.length === 0 ? (
+          <p className="family-photos-empty">Nothing marked yet — the amber dots are waiting.</p>
+        ) : (
+          entries.map((entry) => {
+            const familyUrl = entry.familyPhotoId ? photoUrls.get(entry.familyPhotoId) : undefined
+            const voiceUrl = entry.voiceId ? voiceUrls.get(entry.voiceId) : undefined
+            return (
+              <article className="keepsake-entry" key={entry.contentId}>
+                <p className="keepsake-entry-title">
+                  {entryMarks(entry)}
+                  {entry.title}
+                </p>
+                {entry.detail ? <p className="keepsake-entry-detail">{entry.detail}</p> : null}
+                {entry.note ? <p className="keepsake-entry-note">“{entry.note}”</p> : null}
+                {voiceUrl ? <audio controls src={voiceUrl} preload="metadata" /> : null}
+                {familyUrl ? (
+                  <img className="keepsake-thumb" src={familyUrl} alt="A photo your family took" />
+                ) : entry.imageSrc ? (
+                  <img className="keepsake-thumb" src={entry.imageSrc} alt="" />
+                ) : null}
+              </article>
+            )
+          })
+        )}
+        {/* Family photos that were added but never marked — the export appends
+            these too, so the preview shows the same page. */}
+        {photos
+          .filter((photo) => !entries.some((entry) => entry.familyPhotoId === photo.id))
+          .map((photo) => {
+            const stop = routeStops.find((s) => s.id === photo.stopId)
+            const url = photoUrls.get(photo.id)
+            return url ? (
+              <article className="keepsake-entry" key={photo.id}>
+                <p className="keepsake-entry-title">Photo — {stop?.name ?? 'along the way'}</p>
+                <img className="keepsake-thumb" src={url} alt="A photo your family took" />
+              </article>
+            ) : null
+          })}
+      </section>
 
       <button
         type="button"
