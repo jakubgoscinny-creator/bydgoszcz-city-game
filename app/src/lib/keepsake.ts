@@ -61,6 +61,9 @@ function describeContentId(contentId: string): { order: number; title: string; d
     return { order: 7000, title: `Good to know: ${tip?.title ?? parts[1]}`, detail: '' }
   }
   if (parts[0] === 'garbary') {
+    if (parts[1] === 'chimney-photo') {
+      return { order: 8000, title: 'Garbary: the chimney photo', detail: '' }
+    }
     const section = garbarySections.find((s) => s.id === parts[1])
     return { order: 8000, title: `Garbary: ${section?.title ?? parts[1]}`, detail: '' }
   }
@@ -79,7 +82,11 @@ export async function downloadKeepsake(): Promise<void> {
 
   const photoData = new Map<string, string>()
   for (const photo of photos.sort((a, b) => a.createdAt - b.createdAt)) {
-    photoData.set(photo.id, await blobToDataUrl(photo.blob))
+    try {
+      photoData.set(photo.id, await blobToDataUrl(photo.blob))
+    } catch {
+      // one unreadable blob shouldn't sink the whole keepsake
+    }
   }
 
   const visitor = getVisitorLabel()

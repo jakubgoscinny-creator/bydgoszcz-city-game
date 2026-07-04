@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { mapEmbedUrl, mapSearchUrl } from '../data/route'
 
 type Props = {
@@ -64,30 +65,36 @@ export function StaticMap({ query, label }: Props) {
         </span>
       </div>
 
-      {open ? (
-        <div className="map-modal" role="dialog" aria-modal="true" aria-label={`Map for ${label}`}>
-          <div className="map-modal-chrome">
-            <span className="map-modal-title">{label}</span>
-            <a
-              className="map-modal-external"
-              href={mapSearchUrl(query)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open in Google Maps
-            </a>
-            <button
-              type="button"
-              className="map-modal-close"
-              aria-label="Close map"
-              onClick={() => setOpen(false)}
-            >
-              ✕
-            </button>
-          </div>
-          <iframe className="map-modal-frame" src={mapEmbedUrl(query)} title={`Map for ${label}`} />
-        </div>
-      ) : null}
+      {open
+        ? // Portal to <body>: the transformed swipe track would otherwise become
+          // the containing block for position: fixed and trap the modal (and its
+          // close button) inside the tall stop card.
+          createPortal(
+            <div className="map-modal" role="dialog" aria-modal="true" aria-label={`Map for ${label}`}>
+              <div className="map-modal-chrome">
+                <span className="map-modal-title">{label}</span>
+                <a
+                  className="map-modal-external"
+                  href={mapSearchUrl(query)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open in Google Maps
+                </a>
+                <button
+                  type="button"
+                  className="map-modal-close"
+                  aria-label="Close map"
+                  onClick={() => setOpen(false)}
+                >
+                  ✕
+                </button>
+              </div>
+              <iframe className="map-modal-frame" src={mapEmbedUrl(query)} title={`Map for ${label}`} />
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   )
 }

@@ -1,8 +1,10 @@
 // Best-effort, fire-and-forget sync of reaction events to Supabase.
 // The anon key below can only INSERT into `reactions` and upload into the
-// `keepsake-photos` bucket (enforced by RLS) — it cannot read anything back,
-// so shipping it in the bundle is intentional and safe. Baked-in defaults keep
-// the GitHub Pages mirror syncing too; Vercel env vars override them.
+// `keepsake-photos` bucket (enforced by RLS); the reactions table has no
+// public SELECT. Uploaded photos ARE publicly readable by their unguessable
+// UUID URL — an accepted trade-off so photo_url links work when the table is
+// read later. Shipping the key in the bundle is intentional; baked-in
+// defaults keep the GitHub Pages mirror syncing, Vercel env vars override.
 
 import {
   deleteOutboxEvent,
@@ -74,11 +76,16 @@ export async function syncPending(): Promise<void> {
   if (syncing || typeof navigator !== 'undefined' && navigator.onLine === false) return
   syncing = true
   try {
-    const events = await loadOutbox()
-    for (const event of events) {
-      const ok = await pushEvent(event).catch(() => false)
-      if (!ok) return
-      if (event.id !== undefined) await deleteOutboxEvent(event.id)
+    // Re-read the outbox after each drain so events enqueued while a sync was
+    // in flight go out now instead of waiting for the next trigger.
+    for (let round = 0; round < 10; round++) {
+      const events = await loadOutbox()
+      if (events.length === 0) return
+      for (const event of events) {
+        const ok = await pushEvent(event).catch(() => false)
+        if (!ok) return
+        if (event.id !== undefined) await deleteOutboxEvent(event.id)
+      }
     }
   } catch {
     // best-effort by design

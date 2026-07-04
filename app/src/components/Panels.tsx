@@ -167,6 +167,7 @@ function FoodCard({ place }: { place: (typeof foodPlaces)[number] }) {
 export function KeepsakePanel({ onClose }: { onClose: () => void }) {
   const { reactions, photos, visitorLabel, setVisitorLabel } = useReactions()
   const [busy, setBusy] = useState(false)
+  const [exportFailed, setExportFailed] = useState(false)
   const markedCount = [...reactions.values()].filter(
     (r) => r.liked || r.hearted || (r.note && r.note.length > 0),
   ).length
@@ -207,13 +208,18 @@ export function KeepsakePanel({ onClose }: { onClose: () => void }) {
         disabled={busy}
         onClick={() => {
           setBusy(true)
-          void downloadKeepsake().finally(() => setBusy(false))
+          setExportFailed(false)
+          void downloadKeepsake()
+            .catch(() => setExportFailed(true))
+            .finally(() => setBusy(false))
         }}
       >
         {busy ? 'Folding the page…' : 'Download the day'}
       </button>
       <p className="keepsake-note">
-        One page with everything you marked — save it, print it, or send it on.
+        {exportFailed
+          ? "That didn't save — try once more, or free up a little space on the phone."
+          : 'One page with everything you marked — save it, print it, or send it on.'}
       </p>
     </Sheet>
   )

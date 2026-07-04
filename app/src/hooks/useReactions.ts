@@ -158,18 +158,24 @@ export function useReactionsProvider(): ReactionsApi {
       blob,
       createdAt: Date.now(),
     }
-    await savePhoto(photo)
+    // Show the photo even if persistence fails (quota, private mode) —
+    // local-first means the tap never silently no-ops.
     setPhotos((current) => [...current, photo])
     const url = URL.createObjectURL(blob)
     urlsRef.current.set(photo.id, url)
     setPhotoUrls((current) => new Map(current).set(photo.id, url))
-    await enqueueOutbox({
-      contentId: familyPhotoId(photo.id),
-      photoId: photo.id,
-      visitorLabel: getVisitorLabel() || null,
-      createdAt: Date.now(),
-    }).catch(() => {})
-    kickSync()
+    try {
+      await savePhoto(photo)
+      await enqueueOutbox({
+        contentId: familyPhotoId(photo.id),
+        photoId: photo.id,
+        visitorLabel: getVisitorLabel() || null,
+        createdAt: Date.now(),
+      })
+      kickSync()
+    } catch {
+      // photo stays visible this session; it just won't survive a reload
+    }
   }, [])
 
   const setVisitorLabel = useCallback((label: string) => {

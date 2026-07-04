@@ -50,7 +50,12 @@ function openDb(): Promise<IDBDatabase> {
       }
     }
     request.onsuccess = () => resolve(request.result)
-    request.onerror = () => reject(request.error)
+    request.onerror = () => {
+      // Don't cache a rejected promise — a transient failure (private mode,
+      // storage pressure) would otherwise disable persistence all session.
+      dbPromise = null
+      reject(request.error)
+    }
   })
   return dbPromise
 }

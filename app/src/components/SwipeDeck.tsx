@@ -14,8 +14,8 @@ type Props = {
 
 type GestureState =
   | { phase: 'idle' }
-  | { phase: 'pending'; startX: number; startY: number; startTime: number }
-  | { phase: 'dragging'; startX: number; startY: number; startTime: number; pointerId: number }
+  | { phase: 'pending'; pointerId: number; startX: number; startY: number; startTime: number }
+  | { phase: 'dragging'; pointerId: number; startX: number; startY: number; startTime: number }
 
 /**
  * Axis-locked horizontal swipe between stops.
@@ -45,11 +45,15 @@ export function SwipeDeck({ index, count, onIndexChange, onFirstSwipe, children 
   useEffect(() => reset, [index, reset])
 
   const handlePointerDown = (e: React.PointerEvent) => {
+    // One gesture at a time: a second finger mid-drag must not steal or
+    // corrupt the anchor (kids' hands land everywhere).
+    if (gesture.current.phase !== 'idle') return
     if (e.pointerType === 'mouse' && e.button !== 0) return
     const target = e.target as Element
     if (target.closest('a, button, input, textarea, select, iframe, [data-no-swipe]')) return
     gesture.current = {
       phase: 'pending',
+      pointerId: e.pointerId,
       startX: e.clientX,
       startY: e.clientY,
       startTime: performance.now(),
@@ -58,13 +62,18 @@ export function SwipeDeck({ index, count, onIndexChange, onFirstSwipe, children 
 
   const handlePointerMove = (e: React.PointerEvent) => {
     const g = gesture.current
-    if (g.phase === 'idle') return
+    if (g.phase === 'idle' || e.pointerId !== g.pointerId) return
+    // Mouse released outside the window: no pointerup ever reaches us.
+    if (e.pointerType === 'mouse' && e.buttons === 0) {
+      reset()
+      return
+    }
     const dx = e.clientX - g.startX
     const dy = e.clientY - g.startY
 
     if (g.phase === 'pending') {
       if (Math.abs(dx) > LOCK_DISTANCE && Math.abs(dx) > Math.abs(dy) * HORIZONTAL_BIAS) {
-        gesture.current = { ...g, phase: 'dragging', pointerId: e.pointerId }
+        gesture.current = { ...g, phase: 'dragging' }
         trackRef.current?.setPointerCapture(e.pointerId)
         setDragging(true)
       } else if (Math.abs(dy) > LOCK_DISTANCE && Math.abs(dy) >= Math.abs(dx)) {
@@ -80,10 +89,18 @@ export function SwipeDeck({ index, count, onIndexChange, onFirstSwipe, children 
     setDrag(atEdge ? dx * 0.3 : dx)
   }
 
+  const handlePointerCancel = (e: React.PointerEvent) => {
+    const g = gesture.current
+    if (g.phase === 'idle' || e.pointerId !== g.pointerId) return
+    // The browser took the gesture back — abort, never commit a swipe.
+    reset()
+  }
+
   const handlePointerEnd = (e: React.PointerEvent) => {
     const g = gesture.current
+    if (g.phase === 'idle' || e.pointerId !== g.pointerId) return
     if (g.phase !== 'dragging') {
-      gesture.current = { phase: 'idle' }
+      reset()
       return
     }
     const dx = e.clientX - g.startX
@@ -115,7 +132,7 @@ export function SwipeDeck({ index, count, onIndexChange, onFirstSwipe, children 
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}
-      onPointerCancel={handlePointerEnd}
+      onPointerCancel={handlePointerCancel}
       onClickCapture={(e) => {
         if (suppressClick.current) {
           e.preventDefault()

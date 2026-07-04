@@ -23,7 +23,10 @@ export function StopPhoto({ contentId, src, alt, caption, notePlaceholder }: Pro
   const [stamp, setStamp] = useState(false)
   const lastTap = useRef(0)
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Taps on the corner reaction dot / pencil / note input are their own
+    // interaction — they must not count toward the double-tap heart.
+    if ((e.target as Element).closest('button, input, .amber-wrap, .amber-note-row')) return
     const now = performance.now()
     if (now - lastTap.current < DOUBLE_TAP_MS) {
       lastTap.current = 0
