@@ -129,12 +129,11 @@ export const foodPlaces: FoodPlace[] = [
     slug: 'over-the-under',
     name: 'Over The Under PUB',
     address: 'ul. Dworcowa 51',
-    kind: 'Live-music pub — adults',
+    kind: 'Live-music pub',
     summary:
       'An independent concert pub with weekly live gigs, jam sessions, open-stage nights, and stand-up — a partner of the UNESCO "Bydgoszcz City of Music" story.',
     familyNote:
-      'Adults only, evenings only — this one is for a parents\' night out, not the family walk.',
-    adultsOnly: true,
+      'The most music-filled room in town most nights of the week — worth checking the gig calendar for what\'s on while you\'re here.',
     mapQuery: 'Over The Under PUB, Dworcowa 51, Bydgoszcz, Poland',
     sourceUrl: 'https://overtheunder.pl/pub/',
   },

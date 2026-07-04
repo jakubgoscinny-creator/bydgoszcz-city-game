@@ -17,6 +17,16 @@ export const garbaryId = (sectionId: string) => `garbary:${sectionId}`
 
 export const familyPhotoId = (photoId: string) => `familyPhoto:${photoId}`
 
+export const familyVoiceId = (voiceId: string) => `familyVoice:${voiceId}`
+
+/** Path-safe slug from a contentId, for storage object paths. */
+export const audioPathSlug = (contentId: string) =>
+  contentId
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60) || 'note'
+
 export const slugify = (value: string) =>
   value
     .toLowerCase()

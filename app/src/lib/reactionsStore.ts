@@ -7,6 +7,8 @@ export type ReactionState = {
   liked?: boolean
   hearted?: boolean
   note?: string
+  voiceId?: string
+  voiceDuration?: number
   updatedAt: number
 }
 
@@ -17,6 +19,15 @@ export type FamilyPhoto = {
   createdAt: number
 }
 
+export type FamilyVoiceNote = {
+  id: string
+  /** Path-safe owner slug (stop id, or e.g. "tip-sunday") used in storage paths. */
+  stopId: string
+  blob: Blob
+  durationSec: number
+  createdAt: number
+}
+
 export type OutboxEvent = {
   id?: number
   contentId: string
@@ -24,12 +35,13 @@ export type OutboxEvent = {
   note?: string | null
   emoji?: string | null
   photoId?: string | null
+  voiceId?: string | null
   visitorLabel?: string | null
   createdAt: number
 }
 
 const DB_NAME = 'amber-marks'
-const DB_VERSION = 1
+const DB_VERSION = 2
 
 let dbPromise: Promise<IDBDatabase> | null = null
 
@@ -47,6 +59,10 @@ function openDb(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains('outbox')) {
         db.createObjectStore('outbox', { keyPath: 'id', autoIncrement: true })
+      }
+      // v2: voice notes get their own store — never mixed into photos.
+      if (!db.objectStoreNames.contains('voiceNotes')) {
+        db.createObjectStore('voiceNotes', { keyPath: 'id' })
       }
     }
     request.onsuccess = () => resolve(request.result)
@@ -98,6 +114,22 @@ export async function loadAllPhotos(): Promise<FamilyPhoto[]> {
 
 export async function deletePhoto(id: string): Promise<void> {
   await withStore('photos', 'readwrite', (store) => store.delete(id))
+}
+
+export async function saveVoiceNote(voice: FamilyVoiceNote): Promise<void> {
+  await withStore('voiceNotes', 'readwrite', (store) => store.put(voice))
+}
+
+export async function loadVoiceNote(id: string): Promise<FamilyVoiceNote | undefined> {
+  return withStore('voiceNotes', 'readonly', (store) => store.get(id) as IDBRequest<FamilyVoiceNote | undefined>)
+}
+
+export async function loadAllVoiceNotes(): Promise<FamilyVoiceNote[]> {
+  return withStore('voiceNotes', 'readonly', (store) => store.getAll() as IDBRequest<FamilyVoiceNote[]>)
+}
+
+export async function deleteVoiceNote(id: string): Promise<void> {
+  await withStore('voiceNotes', 'readwrite', (store) => store.delete(id))
 }
 
 export async function enqueueOutbox(event: OutboxEvent): Promise<void> {

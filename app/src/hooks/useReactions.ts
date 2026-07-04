@@ -11,27 +11,32 @@ import {
   getVisitorLabel,
   loadAllPhotos,
   loadAllReactions,
+  loadAllVoiceNotes,
   newPhotoId,
   savePhoto,
   saveReaction,
+  saveVoiceNote,
   setVisitorLabel as persistVisitorLabel,
   type FamilyPhoto,
+  type FamilyVoiceNote,
   type ReactionState,
 } from '../lib/reactionsStore'
 import { kickSync } from '../lib/supabaseSync'
-import { familyPhotoId } from '../lib/contentIds'
+import { audioPathSlug, familyPhotoId } from '../lib/contentIds'
 
 export type ReactionsApi = {
   ready: boolean
   reactions: Map<string, ReactionState>
   photos: FamilyPhoto[]
   photoUrls: Map<string, string>
+  voiceUrls: Map<string, string>
   visitorLabel: string
   setVisitorLabel: (label: string) => void
   toggleLike: (contentId: string) => void
   toggleHeart: (contentId: string) => void
   saveNote: (contentId: string, note: string) => void
   addFamilyPhoto: (stopId: string, file: File) => Promise<void>
+  addVoiceNote: (contentId: string, blob: Blob, durationSec: number) => Promise<void>
 }
 
 export const ReactionsContext = createContext<ReactionsApi | null>(null)
@@ -71,15 +76,17 @@ export function useReactionsProvider(): ReactionsApi {
   const [photos, setPhotos] = useState<FamilyPhoto[]>([])
   const [photoUrls, setPhotoUrls] = useState<Map<string, string>>(new Map())
   const [visitorLabel, setVisitorLabelState] = useState('')
+  const [voiceUrls, setVoiceUrls] = useState<Map<string, string>>(new Map())
   const urlsRef = useRef<Map<string, string>>(new Map())
+  const voiceUrlsRef = useRef<Map<string, string>>(new Map())
   // Mutations read/write through this ref so persistence side effects stay
   // outside the React state updater (StrictMode runs updaters twice).
   const reactionsRef = useRef<Map<string, ReactionState>>(new Map())
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([loadAllReactions(), loadAllPhotos()])
-      .then(([storedReactions, storedPhotos]) => {
+    Promise.all([loadAllReactions(), loadAllPhotos(), loadAllVoiceNotes()])
+      .then(([storedReactions, storedPhotos, storedVoices]) => {
         if (cancelled) return
         const map = new Map(storedReactions.map((r) => [r.contentId, r]))
         reactionsRef.current = map
@@ -91,6 +98,11 @@ export function useReactionsProvider(): ReactionsApi {
         )
         urlsRef.current = urls
         setPhotoUrls(urls)
+        const audioUrls = new Map(
+          storedVoices.map((v) => [v.id, URL.createObjectURL(v.blob)]),
+        )
+        voiceUrlsRef.current = audioUrls
+        setVoiceUrls(audioUrls)
         setVisitorLabelState(getVisitorLabel())
         setReady(true)
       })
@@ -98,6 +110,7 @@ export function useReactionsProvider(): ReactionsApi {
     return () => {
       cancelled = true
       urlsRef.current.forEach((url) => URL.revokeObjectURL(url))
+      voiceUrlsRef.current.forEach((url) => URL.revokeObjectURL(url))
     }
   }, [])
 
@@ -178,6 +191,51 @@ export function useReactionsProvider(): ReactionsApi {
     }
   }, [])
 
+  const addVoiceNote = useCallback(
+    async (contentId: string, blob: Blob, durationSec: number) => {
+      const voice: FamilyVoiceNote = {
+        id: newPhotoId(),
+        stopId: audioPathSlug(contentId),
+        blob,
+        durationSec,
+        createdAt: Date.now(),
+      }
+      // Optimistic: playable immediately even if persistence fails.
+      const url = URL.createObjectURL(blob)
+      voiceUrlsRef.current.set(voice.id, url)
+      setVoiceUrls((current) => new Map(current).set(voice.id, url))
+      const previous = reactionsRef.current.get(contentId)
+      const nextState: ReactionState = {
+        contentId,
+        ...previous,
+        voiceId: voice.id,
+        voiceDuration: durationSec,
+        updatedAt: Date.now(),
+      }
+      const next = new Map(reactionsRef.current)
+      next.set(contentId, nextState)
+      reactionsRef.current = next
+      setReactions(next)
+      try {
+        await saveVoiceNote(voice)
+        await saveReaction(nextState)
+        await enqueueOutbox({
+          contentId,
+          liked: nextState.liked ?? null,
+          note: nextState.note ?? null,
+          emoji: nextState.hearted ? '❤' : null,
+          voiceId: voice.id,
+          visitorLabel: getVisitorLabel() || null,
+          createdAt: Date.now(),
+        })
+        kickSync()
+      } catch {
+        // stays playable this session; it just won't survive a reload
+      }
+    },
+    [],
+  )
+
   const setVisitorLabel = useCallback((label: string) => {
     setVisitorLabelState(label)
     persistVisitorLabel(label)
@@ -188,11 +246,13 @@ export function useReactionsProvider(): ReactionsApi {
     reactions,
     photos,
     photoUrls,
+    voiceUrls,
     visitorLabel,
     setVisitorLabel,
     toggleLike,
     toggleHeart,
     saveNote,
     addFamilyPhoto,
+    addVoiceNote,
   }
 }

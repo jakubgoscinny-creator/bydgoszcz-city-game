@@ -10,12 +10,13 @@ import {
   garbaryPhotoCreditUrl,
 } from '../data/garbary'
 import { foodId, garbaryId, tipId } from '../lib/contentIds'
+import { foodPhotos } from '../data/foodPhotos'
 import { useReactions } from '../hooks/useReactions'
 import { ReactionDot } from './ReactionDot'
 import { StopPhoto } from './StopPhoto'
 import { downloadKeepsake } from '../lib/keepsake'
 
-export type PanelId = 'tips' | 'garbary' | 'food' | 'keepsake' | null
+export type PanelId = 'howto' | 'tips' | 'garbary' | 'food' | 'keepsake' | null
 
 type SheetProps = {
   title: string
@@ -50,6 +51,64 @@ function Sheet({ title, kicker, onClose, children }: SheetProps) {
       </div>
       <div className="sheet-body">{children}</div>
     </div>
+  )
+}
+
+const howItWorks = [
+  {
+    emoji: '🧭',
+    title: 'The trail',
+    body: 'Ten stops through central Bydgoszcz. Swipe left to walk forward — or use the buttons at the bottom. Every stop has clues for the kids and stories for the grown-ups, all on one card you just scroll.',
+  },
+  {
+    emoji: '🟠',
+    title: 'The amber dots',
+    body: "See a small amber dot after a fact? Tap it to mark it as a favourite — it fills gold. That's the whole move. No accounts, no star ratings, no wrong answers.",
+  },
+  {
+    emoji: '❤️',
+    title: 'Photos',
+    body: 'Double-tap any photo to stamp a heart on it. And every stop has an "Add a photo" button — your own shots become part of the story of the day.',
+  },
+  {
+    emoji: '✏️',
+    title: 'Written notes',
+    body: 'The little pencil beside any dot opens a one-line note — what someone said, what made everyone laugh, which cake won.',
+  },
+  {
+    emoji: '🎙️',
+    title: 'Voice notes',
+    body: "The mic beside the pencil records up to twenty seconds — a kid's reaction, the sound of the fountain, a verdict on the ice cream. Listen back, then keep it or toss it.",
+  },
+  {
+    emoji: '📔',
+    title: 'The keepsake',
+    body: 'Everything you mark stays on this phone, even with no signal. Whenever you like, open the menu → "Your keepsake" → "Download the day" for one page holding the whole adventure.',
+  },
+]
+
+export function HowItWorksPanel({ onClose }: { onClose: () => void }) {
+  return (
+    <Sheet title="How this works" kicker="Welcome to the trail" onClose={onClose}>
+      <p className="sheet-intro">
+        A city walk that doubles as a family journal. Two minutes of reading, then the streets take
+        over.
+      </p>
+      {howItWorks.map((item) => (
+        <section className="tip-card" key={item.title}>
+          <h3>
+            <span className="tip-emoji" aria-hidden="true">
+              {item.emoji}
+            </span>
+            {item.title}
+          </h3>
+          <p>{item.body}</p>
+        </section>
+      ))}
+      <button type="button" className="primary-link" onClick={onClose}>
+        Let&apos;s go
+      </button>
+    </Sheet>
   )
 }
 
@@ -109,6 +168,22 @@ export function GarbaryPanel({ onClose }: { onClose: () => void }) {
               ) : null}
             </p>
           ))}
+          {section.photo ? (
+            <>
+              <StopPhoto
+                contentId={garbaryId(`${section.id}-photo`)}
+                src={section.photo.src}
+                alt={section.photo.alt}
+                caption={section.photo.alt}
+                notePlaceholder="spotted it yet…"
+              />
+              <p className="photo-credit">
+                <a href={section.photo.creditUrl} target="_blank" rel="noreferrer">
+                  {section.photo.credit}
+                </a>
+              </p>
+            </>
+          ) : null}
         </section>
       ))}
     </Sheet>
@@ -138,8 +213,17 @@ function FoodCard({ place }: { place: (typeof foodPlaces)[number] }) {
   const pairedStop = place.nearStopId
     ? routeStops.find((s) => s.id === place.nearStopId)
     : undefined
+  const photo = foodPhotos[place.slug]
   return (
     <section className={`food-card ${place.adultsOnly ? 'is-adults' : ''}`}>
+      {photo ? (
+        <StopPhoto
+          contentId={`${foodId(place.slug)}:photo`}
+          src={photo}
+          alt={`${place.name} — ${place.kind.toLowerCase()}`}
+          notePlaceholder="verdict from the table…"
+        />
+      ) : null}
       <div className="food-card-head">
         <p className="food-kind">
           {place.kind}
@@ -267,6 +351,10 @@ export function TrailMenu({
         </div>
 
         <div className="menu-links">
+          <button type="button" onClick={() => onOpenPanel('howto')}>
+            <span className="menu-emoji" aria-hidden="true">💡</span> How this works
+            <small>dots, notes, voice memos, keepsake</small>
+          </button>
           <button type="button" onClick={() => onOpenPanel('tips')}>
             <span className="menu-emoji" aria-hidden="true">🧭</span> Good to know
             <small>Poland tips for the week</small>

@@ -6,7 +6,12 @@ import { routeStops } from '../data/route'
 import { foodPlaces } from '../data/food'
 import { polandTips } from '../data/tips'
 import { garbarySections } from '../data/garbary'
-import { loadAllPhotos, loadAllReactions, getVisitorLabel } from './reactionsStore'
+import {
+  getVisitorLabel,
+  loadAllPhotos,
+  loadAllReactions,
+  loadAllVoiceNotes,
+} from './reactionsStore'
 
 const escapeHtml = (value: string) =>
   value
@@ -64,6 +69,14 @@ function describeContentId(contentId: string): { order: number; title: string; d
     if (parts[1] === 'chimney-photo') {
       return { order: 8000, title: 'Garbary: the chimney photo', detail: '' }
     }
+    if (parts[1].endsWith('-photo')) {
+      const section = garbarySections.find((s) => s.id === parts[1].replace(/-photo$/, ''))
+      return {
+        order: 8000,
+        title: `Garbary: photo — ${section?.title ?? parts[1]}`,
+        detail: '',
+      }
+    }
     const section = garbarySections.find((s) => s.id === parts[1])
     return { order: 8000, title: `Garbary: ${section?.title ?? parts[1]}`, detail: '' }
   }
@@ -74,9 +87,13 @@ function describeContentId(contentId: string): { order: number; title: string; d
 }
 
 export async function downloadKeepsake(): Promise<void> {
-  const [reactions, photos] = await Promise.all([loadAllReactions(), loadAllPhotos()])
+  const [reactions, photos, voiceNotes] = await Promise.all([
+    loadAllReactions(),
+    loadAllPhotos(),
+    loadAllVoiceNotes(),
+  ])
   const marked = reactions
-    .filter((r) => r.liked || r.hearted || (r.note && r.note.length > 0))
+    .filter((r) => r.liked || r.hearted || (r.note && r.note.length > 0) || r.voiceId)
     .map((r) => ({ ...r, ...describeContentId(r.contentId) }))
     .sort((a, b) => a.order - b.order || a.updatedAt - b.updatedAt)
 
@@ -86,6 +103,15 @@ export async function downloadKeepsake(): Promise<void> {
       photoData.set(photo.id, await blobToDataUrl(photo.blob))
     } catch {
       // one unreadable blob shouldn't sink the whole keepsake
+    }
+  }
+
+  const voiceData = new Map<string, string>()
+  for (const voice of voiceNotes) {
+    try {
+      voiceData.set(voice.id, await blobToDataUrl(voice.blob))
+    } catch {
+      // skip an unreadable recording rather than sinking the export
     }
   }
 
@@ -104,10 +130,14 @@ export async function downloadKeepsake(): Promise<void> {
       const img = photoId && photoData.get(photoId)
         ? `<img src="${photoData.get(photoId)}" alt="Family photo" />`
         : ''
+      const audio = entry.voiceId && voiceData.get(entry.voiceId)
+        ? `<audio controls src="${voiceData.get(entry.voiceId)}"></audio>`
+        : ''
       return `<section class="entry">
-        <h2>${entry.liked ? '● ' : ''}${entry.hearted ? '♥ ' : ''}${escapeHtml(entry.title)}</h2>
+        <h2>${entry.liked ? '● ' : ''}${entry.hearted ? '♥ ' : ''}${entry.voiceId ? '🎙 ' : ''}${escapeHtml(entry.title)}</h2>
         ${entry.detail ? `<p class="detail">${escapeHtml(entry.detail)}</p>` : ''}
         ${entry.note ? `<p class="note">“${escapeHtml(entry.note)}”</p>` : ''}
+        ${audio}
         ${img}
       </section>`
     })
@@ -143,6 +173,7 @@ export async function downloadKeepsake(): Promise<void> {
   .detail { margin: 0 0 0.4rem; font-size: 0.94rem; }
   .note { margin: 0.2rem 0; font-size: 1.05rem; font-style: italic; color: #52351f; }
   img { max-width: 100%; border-radius: 10px; margin-top: 0.6rem; }
+  audio { width: 100%; margin-top: 0.6rem; }
   .empty { font-style: italic; }
 </style></head>
 <body><main>

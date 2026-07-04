@@ -7,6 +7,7 @@ import { StopCard } from './components/StopCard'
 import {
   FoodPanel,
   GarbaryPanel,
+  HowItWorksPanel,
   KeepsakePanel,
   TipsPanel,
   TrailMenu,
@@ -18,6 +19,7 @@ type Theme = 'day' | 'dusk' | 'night'
 
 const THEME_KEY = 'bydgoszcz-theme'
 const HINT_KEY = 'amber-swipe-hint-done'
+const WELCOME_KEY = 'trail-welcome-seen'
 
 function loadTheme(): Theme {
   try {
@@ -33,7 +35,14 @@ function App() {
   const [activeStop, setActiveStop] = useState(0)
   const [theme, setTheme] = useState<Theme>(loadTheme)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [panel, setPanel] = useState<PanelId>(null)
+  // First-time visitors land on "How this works" so nothing needs discovering.
+  const [panel, setPanel] = useState<PanelId>(() => {
+    try {
+      return localStorage.getItem(WELCOME_KEY) ? null : 'howto'
+    } catch {
+      return 'howto'
+    }
+  })
   const [showHint, setShowHint] = useState(() => {
     try {
       return !localStorage.getItem(HINT_KEY)
@@ -66,10 +75,11 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (!showHint) return
+    // Don't burn the one-time swipe hint while the welcome sheet covers it.
+    if (!showHint || panel !== null) return
     const timer = window.setTimeout(() => dismissHint(), 6500)
     return () => window.clearTimeout(timer)
-  }, [showHint, dismissHint])
+  }, [showHint, panel, dismissHint])
 
   const goToStop = (index: number) => {
     setActiveStop(Math.max(0, Math.min(routeStops.length - 1, index)))
@@ -127,11 +137,12 @@ function App() {
                 nextStop={routeStops[index + 1]}
                 isActive={index === activeStop}
                 showDotHint={showHint && index === 0}
+                onOpenGarbary={index === 0 ? () => setPanel('garbary') : undefined}
               />
             ))}
           </SwipeDeck>
 
-          {showHint ? (
+          {showHint && panel === null ? (
             <div className="swipe-hint" aria-hidden="true">
               <span className="swipe-hint-chevrons">
                 <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -180,6 +191,18 @@ function App() {
           onThemeChange={setTheme}
         />
 
+        {panel === 'howto' ? (
+          <HowItWorksPanel
+            onClose={() => {
+              setPanel(null)
+              try {
+                localStorage.setItem(WELCOME_KEY, 'yes')
+              } catch {
+                // it'll just show again next visit
+              }
+            }}
+          />
+        ) : null}
         {panel === 'tips' ? <TipsPanel onClose={() => setPanel(null)} /> : null}
         {panel === 'garbary' ? <GarbaryPanel onClose={() => setPanel(null)} /> : null}
         {panel === 'food' ? <FoodPanel onClose={() => setPanel(null)} /> : null}

@@ -2,10 +2,10 @@
 /**
  * Optimize route-stop photos for the Bydgoszcz City Game app.
  *
- * Usage: node scripts/optimize-photos.mjs <raw-dir>
+ * Usage: node scripts/optimize-photos.mjs <raw-dir> [out-dir]
  *
  * Takes every .jpg/.jpeg/.png in <raw-dir> and writes an optimized
- * `src/assets/stops/<basename>.webp`:
+ * `<out-dir>/<basename>.webp` (default out-dir: `src/assets/stops/`):
  *   - auto-rotated according to EXIF orientation
  *   - resized to max width 1200px (never enlarged)
  *   - WebP quality 78, stepping quality down if a file exceeds ~250 KB
@@ -26,13 +26,15 @@ if (!rawDir) {
   process.exit(1);
 }
 
-const outDir = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..',
-  'src',
-  'assets',
-  'stops',
-);
+const outDir =
+  process.argv[3] ??
+  path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '..',
+    'src',
+    'assets',
+    'stops',
+  );
 await mkdir(outDir, { recursive: true });
 
 const files = (await readdir(rawDir)).filter((f) => /\.(jpe?g|png)$/i.test(f));

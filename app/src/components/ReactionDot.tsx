@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useReactions } from '../hooks/useReactions'
+import { VoiceNoteButton } from './VoiceNoteButton'
 
 const LONG_PRESS_MS = 450
 
@@ -123,6 +124,7 @@ export function ReactionDot({ contentId, notePlaceholder, corner, hint }: Props)
   return (
     <>
       {dot}
+      <VoiceNoteButton contentId={contentId} corner={corner} />
       {editing ? (
         <span className={`amber-note-row ${corner ? 'amber-note-row-corner' : ''}`}>
           <input

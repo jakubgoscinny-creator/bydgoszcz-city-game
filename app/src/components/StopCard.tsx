@@ -13,9 +13,10 @@ type Props = {
   nextStop?: RouteStop
   isActive: boolean
   showDotHint: boolean
+  onOpenGarbary?: () => void
 }
 
-export function StopCard({ stop, index, total, nextStop, isActive, showDotHint }: Props) {
+export function StopCard({ stop, index, total, nextStop, isActive, showDotHint, onOpenGarbary }: Props) {
   const { photos, photoUrls, addFamilyPhoto } = useReactions()
   const [deepOpen, setDeepOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement | null>(null)
@@ -63,6 +64,15 @@ export function StopCard({ stop, index, total, nextStop, isActive, showDotHint }
           </ul>
         </section>
 
+        {onOpenGarbary ? (
+          <button type="button" className="garbary-teaser" onClick={onOpenGarbary}>
+            <span className="deep-dive-kicker">Your street, before you set off</span>
+            <span className="deep-dive-hook">
+              A chimney that moved house, and the man who cracked Enigma — the story of Garbary →
+            </span>
+          </button>
+        ) : null}
+
         <section className="fact-block fact-kids">
           <h3>For little explorers</h3>
           {stop.kidFacts.map((fact, i) => (
@@ -108,6 +118,23 @@ export function StopCard({ stop, index, total, nextStop, isActive, showDotHint }
           </p>
         </section>
 
+        {stop.secondPhoto ? (
+          <div className="second-photo">
+            <StopPhoto
+              contentId={stopUnitId(stop.id, 'photo', 2)}
+              src={stop.secondPhoto.url}
+              alt={stop.secondPhoto.alt}
+              caption={stop.secondPhoto.alt}
+              notePlaceholder="the story behind this one…"
+            />
+            <p className="photo-credit">
+              <a href={stop.secondPhoto.creditUrl} target="_blank" rel="noreferrer">
+                {stop.secondPhoto.credit}
+              </a>
+            </p>
+          </div>
+        ) : null}
+
         <section className="deep-dive">
           <button
             type="button"
@@ -115,7 +142,12 @@ export function StopCard({ stop, index, total, nextStop, isActive, showDotHint }
             aria-expanded={deepOpen}
             onClick={() => setDeepOpen((open) => !open)}
           >
-            <span>{deepOpen ? 'Fold the longer story away' : 'Unfold the longer story'}</span>
+            <span className="deep-dive-teaser">
+              <span className="deep-dive-kicker">
+                {deepOpen ? 'The longer story — fold it away' : 'The longer story'}
+              </span>
+              <span className="deep-dive-hook">{stop.deepDive.teaser}</span>
+            </span>
             <svg viewBox="0 0 24 24" aria-hidden="true" className={deepOpen ? 'is-open' : ''}>
               <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

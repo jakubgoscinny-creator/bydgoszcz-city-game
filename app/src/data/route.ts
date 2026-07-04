@@ -1,5 +1,8 @@
 import oldMarketPhoto from '../assets/stops/old-market.webp'
+import oldMarketLivelyPhoto from '../assets/stops/old-market-lively.webp'
 import millIslandPhoto from '../assets/stops/mill-island.webp'
+import millIslandLivelyPhoto from '../assets/stops/mill-island-lively.webp'
+import brdaWaterPhoto from '../assets/stops/brda-water.webp'
 import rotherInsidePhoto from '../assets/stops/rother-inside.webp'
 import rotherTerracePhoto from '../assets/stops/rother-terrace.webp'
 import mostowaPhoto from '../assets/stops/mostowa.webp'
@@ -19,9 +22,18 @@ export type PausePick = {
 }
 
 export type DeepDive = {
+  /** One enticing hook line shown on the stop card itself. */
+  teaser: string
   intro: string
   kids: string[]
   adults: string[]
+}
+
+export type SecondPhoto = {
+  url: string
+  alt: string
+  credit: string
+  creditUrl: string
 }
 
 export type RouteStop = {
@@ -36,6 +48,8 @@ export type RouteStop = {
   mapQuery: string
   imageUrl: string
   imageAlt: string
+  /** Optional livelier photo shown lower on the card, balancing formal shots. */
+  secondPhoto?: SecondPhoto
   lookFor: string[]
   kidFacts: string[]
   adultFacts: string[]
@@ -86,6 +100,13 @@ export const routeStops: RouteStop[] = [
     memoryPrompt: 'What made the very first impression feel most like Bydgoszcz here?',
     sourceLabel: 'Bydgoszcz cathedral and Old Town notes',
     sourceUrl: 'https://visitbydgoszcz.pl/en/explore/what-to-see/1393-bydgoszcz-cathedral',
+    secondPhoto: {
+      url: oldMarketLivelyPhoto,
+      alt: 'An open-air concert crowd filling the Old Market Square on a summer evening.',
+      credit: 'Photo: Pit1233, Wikimedia Commons, public domain',
+      creditUrl:
+        'https://commons.wikimedia.org/wiki/File:Bydgoszcz_Stary_Rynek_pierzeja_p%C5%82n_ludzie.jpg',
+    },
     geoPosition: { lat: 53.121963, lon: 18.0002735 },
     highlightPause: {
       name: 'Cukiernia Katarynka',
@@ -97,6 +118,8 @@ export const routeStops: RouteStop[] = [
       sourceUrl: 'https://katarynkabydgoszcz.pl/',
     },
     deepDive: {
+      teaser:
+        'A trickster from Polish legend and an invisible line around the planet — this square opens with both.',
       intro:
         'If someone wants the longer version, these fold-outs add extra Bydgoszcz context without sending the family away from the route.',
       kids: [
@@ -142,6 +165,12 @@ export const routeStops: RouteStop[] = [
     memoryPrompt: 'Which bit of water, bridge, or grass made this stop feel most relaxing?',
     sourceLabel: 'Mill Island source page',
     sourceUrl: 'https://visitbydgoszcz.pl/en/explore/what-to-see/1413-mill-island-in-bydgoszcz',
+    secondPhoto: {
+      url: millIslandLivelyPhoto,
+      alt: 'The urban beach on Mill Island — volleyball net, sunbathers, and Opera Nova behind.',
+      credit: 'Photo: Pit1233, Wikimedia Commons, CC0',
+      creditUrl: 'https://commons.wikimedia.org/wiki/File:Bdg_WMplaza_2_07-2013.jpg',
+    },
     geoPosition: { lat: 53.1227908, lon: 17.9959977 },
     highlightPause: {
       name: 'Mill Island lawns',
@@ -153,6 +182,8 @@ export const routeStops: RouteStop[] = [
       sourceUrl: 'https://visitbydgoszcz.pl/en/explore/what-to-see/1413-mill-island-in-bydgoszcz',
     },
     deepDive: {
+      teaser:
+        "This gentle park was once the city's engine room — mills, granaries, and coins minted for the king.",
       intro:
         'Mill Island looks gentle at first, but it is one of the best places to understand how water shaped the city.',
       kids: [
@@ -212,6 +243,8 @@ export const routeStops: RouteStop[] = [
       sourceUrl: 'https://mlynek-bistro.vercel.app/',
     },
     deepDive: {
+      teaser:
+        'How a hardworking flour mill traded grain for ideas — and why nothing here is behind ropes.',
       intro: "This is the point where the route shifts from postcard beauty into the city's working memory.",
       kids: [
         'The fun comparison game here is simple: point at one detail that feels like an old factory and one detail that feels like a new science-and-story space.',
@@ -266,6 +299,7 @@ export const routeStops: RouteStop[] = [
       sourceUrl: 'https://visitbydgoszcz.pl/en/explore/what-to-see/4192-rother-s-mills',
     },
     deepDive: {
+      teaser: 'One deck up, and the whole city plan suddenly clicks into place.',
       intro: 'The terrace is where the route becomes spatial instead of only narrative.',
       kids: [
         'From above, the quest turns into a real spotting puzzle: bridges, roofs, river bends, and tiny paths all become easier to count.',
@@ -310,6 +344,12 @@ export const routeStops: RouteStop[] = [
     memoryPrompt: 'Was this the point where the city finally felt dramatic enough for a postcard?',
     sourceLabel: 'Man Crossing the River source page',
     sourceUrl: 'https://visitbydgoszcz.pl/en/explore/what-to-see/2558-man-crossing-the-river',
+    secondPhoto: {
+      url: brdaWaterPhoto,
+      alt: 'The water tram gliding along the Brda past strolling crowds in the city centre.',
+      credit: 'Photo: Pit1233, Wikimedia Commons, CC0',
+      creditUrl: 'https://commons.wikimedia.org/wiki/File:Bydg_Festiwal_Wodny_2012l.jpg',
+    },
     geoPosition: { lat: 53.1225128, lon: 18.0008557 },
     highlightPause: {
       name: 'Sowa Cafe at 5 Mostowa',
@@ -321,6 +361,8 @@ export const routeStops: RouteStop[] = [
       sourceUrl: 'https://visitbydgoszcz.pl/en/discover/2387-bydgoszcz-specialties',
     },
     deepDive: {
+      teaser:
+        'Why this exact bend of the river became the picture everyone takes home from Bydgoszcz.',
       intro:
         "Mostowa is the route's most theatrical postcard scene, and that is exactly why it tends to become a memory anchor.",
       kids: [
@@ -377,6 +419,7 @@ export const routeStops: RouteStop[] = [
       sourceUrl: 'https://visitbydgoszcz.pl/en/discover/2387-bydgoszcz-specialties',
     },
     deepDive: {
+      teaser: 'The street where Bydgoszcz stops being a river town and starts showing off.',
       intro: 'Gdanska Street adds a different kind of beauty: less river drama, more urban confidence.',
       kids: [
         'This stretch is great for a count-the-details game because windows, balconies, and ornaments keep changing from building to building.',
@@ -433,6 +476,8 @@ export const routeStops: RouteStop[] = [
       sourceUrl: 'https://visitbydgoszcz.pl/en/explore/visitor-itineraries/2907-green',
     },
     deepDive: {
+      teaser:
+        "A convent garden that grew into the city's oldest park — with a flood frozen in bronze at its heart.",
       intro:
         "This square-and-park section gives the walk breathing room while quietly deepening the city's green story.",
       kids: [
@@ -479,6 +524,7 @@ export const routeStops: RouteStop[] = [
     sourceUrl: 'https://visitbydgoszcz.pl/en/wyszukiwarka?searchword=Archer%20Lady',
     geoPosition: { lat: 53.1308744, lon: 18.0121007 },
     deepDive: {
+      teaser: "How a lady with a bow became the whole city's calling card.",
       intro: 'This is the symbolic threshold between street life and the music-and-theatre quarter.',
       kids: [
         'The Archer Lady works almost like a storybook guardian for the district, which is why children usually understand her pose before they know her name.',
@@ -534,6 +580,7 @@ export const routeStops: RouteStop[] = [
       sourceUrl: 'https://www.openstreetmap.org/way/375202206',
     },
     deepDive: {
+      teaser: "A park that was composed rather than planted — one man's plan to fill a district with music.",
       intro: 'Jan Kochanowski Park is where the route settles into a softer, almost musical tempo.',
       kids: [
         'Looking for composer statues gives the park a treasure-hunt feeling, especially if the family invents a tiny tune for each one.',
@@ -580,6 +627,7 @@ export const routeStops: RouteStop[] = [
     sourceUrl: 'https://visitbydgoszcz.pl/en/wyszukiwarka?searchword=Pomeranian%20Philharmonic',
     geoPosition: { lat: 53.1289723, lon: 18.0108252 },
     deepDive: {
+      teaser: 'Why the trail ends quietly on purpose — and what that says about this city.',
       intro: 'The finale works because it is calm, not because it shouts the loudest.',
       kids: [
         'By the end of the route, children can treat the Philharmonic stop like the final level where everyone invents a victory soundtrack together.',

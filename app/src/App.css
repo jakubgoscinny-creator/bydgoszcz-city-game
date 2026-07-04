@@ -372,7 +372,10 @@
   40% { transform: scale(1.35); box-shadow: 0 0 0 9px rgba(217, 150, 43, 0); }
 }
 
-.amber-note-btn {
+/* Pencil (and mic) are always visible and directly tappable — a visible
+   icon beats a hidden hold gesture. Long-press still works as a shortcut. */
+.amber-note-btn,
+.amber-voice-btn {
   display: inline-grid;
   place-items: center;
   width: 24px;
@@ -382,26 +385,22 @@
   border: none;
   background: transparent;
   color: var(--muted);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 160ms ease;
+  opacity: 0.75;
+  transition: opacity 160ms ease, color 160ms ease;
 }
 
-.amber-note-btn svg {
+.amber-note-btn:hover,
+.amber-note-btn:focus-visible,
+.amber-voice-btn:hover,
+.amber-voice-btn:focus-visible {
+  opacity: 1;
+  color: var(--amber-deep);
+}
+
+.amber-note-btn svg,
+.amber-voice-btn svg {
   width: 13px;
   height: 13px;
-}
-
-@media (hover: hover) {
-  .amber-wrap:hover .amber-note-btn {
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
-.amber-wrap:focus-within .amber-note-btn {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 .amber-note-row {
@@ -450,6 +449,155 @@
 [data-theme='dusk'] .amber-note-echo,
 [data-theme='night'] .amber-note-echo {
   color: var(--amber);
+}
+
+/* ── Voice notes ───────────────────────────────────────────── */
+
+.amber-wrap-voice {
+  margin-left: -2px;
+}
+
+.amber-voice-btn.has-voice {
+  color: var(--amber-deep);
+  opacity: 1;
+}
+
+.amber-voice-btn.is-requesting svg {
+  animation: dot-hint 800ms ease-in-out infinite;
+}
+
+.voice-hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--muted);
+  animation: note-unfold 240ms ease-out;
+}
+
+.voice-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.45rem;
+  animation: note-unfold 240ms ease-out;
+}
+
+.voice-stop-btn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border: 2px solid var(--amber);
+  border-radius: 999px;
+  background: transparent;
+}
+
+.voice-stop-square {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--city-red);
+}
+
+.voice-elapsed {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--ink);
+  flex: 0 0 auto;
+}
+
+.voice-progress {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.voice-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--amber);
+  transition: width 120ms linear;
+}
+
+.voice-live-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--city-red);
+  animation: voice-pulse 1100ms ease-in-out infinite;
+}
+
+@keyframes voice-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.78); }
+}
+
+.voice-review {
+  flex-wrap: wrap;
+  padding-bottom: 0.2rem;
+  border-bottom: 2px dashed var(--amber);
+}
+
+.voice-review audio {
+  flex: 1;
+  min-width: 180px;
+  height: 36px;
+}
+
+.voice-review-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.voice-keep,
+.voice-discard {
+  border: none;
+  background: transparent;
+  padding: 0.2rem 0.3rem;
+  font-family: var(--display-font);
+  font-style: italic;
+  font-size: 1rem;
+}
+
+.voice-keep {
+  color: var(--amber-deep);
+  font-weight: 600;
+}
+
+[data-theme='dusk'] .voice-keep,
+[data-theme='night'] .voice-keep {
+  color: var(--amber);
+}
+
+.voice-discard {
+  color: var(--muted);
+}
+
+/* Photo corner: mic stacks above the dot as a small vertical pill */
+.amber-wrap-voice-corner {
+  position: absolute;
+  right: 0.55rem;
+  bottom: calc(0.55rem + 38px);
+  margin: 0;
+  z-index: 2;
+}
+
+.amber-wrap-voice-corner .amber-voice-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(20, 30, 55, 0.42);
+  backdrop-filter: blur(4px);
+  color: #f3e4c8;
+  opacity: 1;
 }
 
 /* Corner variant on photos */
@@ -569,6 +717,45 @@
   font-family: var(--display-font);
   font-style: italic;
   font-size: 1rem;
+}
+
+.deep-dive-teaser {
+  display: grid;
+  gap: 0.25rem;
+  text-align: left;
+  font-style: normal;
+}
+
+.deep-dive-kicker {
+  font-family: var(--body-font);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--city-red);
+}
+
+.deep-dive-hook {
+  font-family: var(--display-font);
+  font-style: italic;
+  font-size: 1.04rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.garbary-teaser {
+  display: grid;
+  gap: 0.25rem;
+  text-align: left;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--amber);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(217, 150, 43, 0.1), transparent 45%),
+    var(--paper-raised);
+  color: var(--ink);
+  box-shadow: var(--card-shadow);
 }
 
 .deep-dive-toggle svg {

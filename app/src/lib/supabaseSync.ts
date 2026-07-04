@@ -11,6 +11,7 @@ import {
   deletePhoto,
   loadOutbox,
   loadPhoto,
+  loadVoiceNote,
   type OutboxEvent,
 } from './reactionsStore'
 
@@ -43,11 +44,45 @@ async function uploadPhoto(photoId: string): Promise<string | null> {
   return `${SUPABASE_URL}/storage/v1/object/public/keepsake-photos/${path}`
 }
 
+const AUDIO_EXTENSIONS: Record<string, string> = {
+  'audio/mp4': 'm4a',
+  'audio/aac': 'aac',
+  'audio/webm': 'webm',
+  'audio/ogg': 'ogg',
+}
+
+function audioExtension(mimeType: string): string {
+  const base = mimeType.split(';')[0].trim().toLowerCase()
+  return AUDIO_EXTENSIONS[base] ?? 'm4a'
+}
+
+async function uploadVoiceNote(voiceId: string): Promise<string | null> {
+  const voice = await loadVoiceNote(voiceId)
+  if (!voice) return null
+  const mime = voice.blob.type || 'audio/mp4'
+  const path = `${voice.stopId}/${voice.id}.${audioExtension(mime)}`
+  const response = await fetch(
+    `${SUPABASE_URL}/storage/v1/object/keepsake-audio/${path}`,
+    {
+      method: 'POST',
+      headers: { ...HEADERS, 'Content-Type': mime.split(';')[0] },
+      body: voice.blob,
+    },
+  )
+  if (!response.ok && response.status !== 409) return null
+  return `${SUPABASE_URL}/storage/v1/object/public/keepsake-audio/${path}`
+}
+
 async function pushEvent(event: OutboxEvent): Promise<boolean> {
   let photoUrl: string | null = null
   if (event.photoId) {
     photoUrl = await uploadPhoto(event.photoId)
     if (!photoUrl) return false
+  }
+  let audioUrl: string | null = null
+  if (event.voiceId) {
+    audioUrl = await uploadVoiceNote(event.voiceId)
+    if (!audioUrl) return false
   }
 
   const response = await fetch(`${SUPABASE_URL}/rest/v1/reactions`, {
@@ -60,6 +95,7 @@ async function pushEvent(event: OutboxEvent): Promise<boolean> {
       note: event.note ?? null,
       emoji: event.emoji ?? null,
       photo_url: photoUrl,
+      audio_url: audioUrl,
       visitor_label: event.visitorLabel || null,
     }),
   })
