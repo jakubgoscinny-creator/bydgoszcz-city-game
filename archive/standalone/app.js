@@ -442,6 +442,9 @@ const pauseSpots = [
     whyItWorks:
       "Best timed on the way toward the theatre quarter when younger walkers need a cheerful reset.",
     mapQuery: "Cafe Primo, Gdanska 18, Bydgoszcz, Poland",
+    routeHint: "Best between Gdanska Street and the park stretch",
+    imageUrl: "https://visitbydgoszcz.pl/images/odkryj/trasy_zwiedzania/jedynak-bydgoszcz.jpg",
+    imageAlt: "Historic buildings along Gdanska Street in Bydgoszcz near Cafe Primo.",
     sourceLabel: "Bydgoszcz specialties source",
     sourceUrl: "https://visitbydgoszcz.pl/en/discover/2387-bydgoszcz-specialties"
   },
@@ -453,6 +456,9 @@ const pauseSpots = [
     whyItWorks:
       "Useful if you want one more personal, less touristy-feeling pause in the day.",
     mapQuery: "Bromberg Coffee, Bydgoszcz, Poland",
+    routeHint: "Flexible near the Old Market start",
+    imageUrl: "https://visitbydgoszcz.pl/images/doswiadcz/co_zobaczyc/katedra3.jpg",
+    imageAlt: "Old Market Square and cathedral zone in Bydgoszcz near the route start.",
     sourceLabel: "Route host pick"
   },
   {
@@ -463,6 +469,9 @@ const pauseSpots = [
     whyItWorks:
       "Best when the family wants a proper midpoint break without leaving the quest.",
     mapQuery: "Mlyny Rothera, Bydgoszcz, Poland",
+    routeHint: "Best as the built-in midpoint breather",
+    imageUrl: "https://visitbydgoszcz.pl/images/odkryj/co_zobaczyc/mlyny-rothera-bydgoszcz-lm.jpg",
+    imageAlt: "Rother's Mills complex beside the river in Bydgoszcz.",
     sourceLabel: "Rother's Mills source",
     sourceUrl: "https://visitbydgoszcz.pl/en/explore/what-to-see/4192-rother-s-mills"
   },
@@ -474,6 +483,9 @@ const pauseSpots = [
     whyItWorks:
       "This is the best late-route child reset because it keeps the music-district theme but turns it into play rather than more looking only.",
     mapQuery: "53.1303538,18.0115320",
+    routeHint: "Best just before the Philharmonic finale",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/23/Park_Jana_Kochanowskiego_w_Bydgoszczy_4_2023.jpg",
+    imageAlt: "Jan Kochanowski Park in Bydgoszcz, home to the musical playground pause.",
     sourceLabel: "OpenStreetMap named playground listing",
     sourceUrl: "https://www.openstreetmap.org/way/375202206"
   },
@@ -485,6 +497,9 @@ const pauseSpots = [
     whyItWorks:
       "A neat bridge-area pause if the family wants a quieter sit-down before Gdanska Street.",
     mapQuery: "Sowa Cafe Mostowa 5, Bydgoszcz, Poland",
+    routeHint: "Best around the postcard bridge section",
+    imageUrl: "https://visitbydgoszcz.pl/images/doswiadcz/co_zobaczyc/przechodzacy.jpg",
+    imageAlt: "Mostowa Bridge zone with the Man Crossing the River sculpture in Bydgoszcz.",
     sourceLabel: "Bydgoszcz specialties source",
     sourceUrl: "https://visitbydgoszcz.pl/en/discover/2387-bydgoszcz-specialties"
   }
@@ -914,11 +929,19 @@ function overviewButtonMarkup(stop, index) {
 
   return `
     <button class="${activeClass}" type="button" data-overview-index="${index}">
-      <span class="overview-index">${String(index + 1).padStart(2, "0")}</span>
-      <strong>${escapeHtml(stop.name)}</strong>
-      <span>${escapeHtml(stop.walkFromPrevious)}</span>
+      <span class="overview-photo">
+        <img src="${stop.imageUrl}" alt="${escapeHtml(stop.imageAlt)}" loading="lazy" />
+        <span class="overview-photo-wash"></span>
+        <span class="overview-index">${String(index + 1).padStart(2, "0")}</span>
+        <span class="overview-signature">${escapeHtml(stop.shortName)}</span>
+      </span>
+      <span class="overview-body">
+        <strong>${escapeHtml(stop.name)}</strong>
+        <span class="overview-meta">${escapeHtml(stop.walkFromPrevious)}</span>
+        <span class="overview-strapline">${escapeHtml(stop.signature)}</span>
+      </span>
       <small class="${memoryBits.length ? "overview-memory" : "overview-memory overview-memory-muted"}">
-        ${escapeHtml(memoryBits.length ? memoryBits.join(" · ") : "no stamp yet")}
+        ${escapeHtml(memoryBits.length ? memoryBits.join(" | ") : "no stamp yet")}
       </small>
     </button>
   `;
@@ -931,15 +954,23 @@ function pauseCardMarkup(spot) {
 
   return `
     <article class="pause-card">
-      <div class="pause-card-top">
-        <span class="pause-kind">${escapeHtml(spot.kind)}</span>
-        <h3>${escapeHtml(spot.name)}</h3>
-      </div>
-      <p>${escapeHtml(spot.summary)}</p>
-      <p class="pause-why">${escapeHtml(spot.whyItWorks)}</p>
-      <div class="pause-actions">
-        <a class="secondary-link" href="${mapSearchUrl(spot.mapQuery)}" target="_blank" rel="noreferrer">Open in Google Maps</a>
-        ${sourceMarkup}
+      <figure class="pause-photo">
+        <img src="${spot.imageUrl}" alt="${escapeHtml(spot.imageAlt)}" loading="lazy" />
+        <figcaption>
+          <span class="pause-kind">${escapeHtml(spot.kind)}</span>
+          <span class="pause-route-hint">${escapeHtml(spot.routeHint)}</span>
+        </figcaption>
+      </figure>
+      <div class="pause-card-body">
+        <div class="pause-card-top">
+          <h3>${escapeHtml(spot.name)}</h3>
+        </div>
+        <p>${escapeHtml(spot.summary)}</p>
+        <p class="pause-why">${escapeHtml(spot.whyItWorks)}</p>
+        <div class="pause-actions">
+          <a class="secondary-link" href="${mapSearchUrl(spot.mapQuery)}" target="_blank" rel="noreferrer">Open in Google Maps</a>
+          ${sourceMarkup}
+        </div>
       </div>
     </article>
   `;
@@ -1190,7 +1221,12 @@ function renderStage() {
   document.getElementById("stop-strapline").textContent = currentStop.strapline;
   document.getElementById("fact-intro-card").innerHTML = `
     <p class="fact-label">Shared story mode</p>
-    <p>Kid clues and adult context now show together, so the family can read one stop without extra taps.</p>
+    <p>Kid clues and adult context now sit in one reading rhythm, with the richer fold-outs only there for anyone who wants the longer version.</p>
+    <div class="story-rhythm">
+      <span>Read together</span>
+      <span>Open extras</span>
+      <span>Stamp the memory</span>
+    </div>
   `;
   document.getElementById("look-for-list").innerHTML = currentStop.lookFor
     .map(

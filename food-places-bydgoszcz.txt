@@ -1,0 +1,16 @@
+Favorite Food Places in Bydgoszcz
+==================================
+
+Drop links to restaurants, cafes, and food spots below, one per line.
+
+-https://mlynek-bistro.vercel.app/
+-https://katarynkabydgoszcz.pl/cukiernia-katarynka-przy-starym-rynku/ 
+
+-https://bromberg.eu/
+-https://restauracjaluizjana.pl/menu,25,pl,items,1.html
+-https://pasibus.pl/lokalizacje/bydgoszcz/bydgoszcz/
+-https://vansaghar.pl/
+-https://www.ogienbydgoszcz.pl/
+-https://sultan-saray.menu.pl/
+-https://overtheunder.pl/pub/
+-https://www.facebook.com/youngerbar.byd/
