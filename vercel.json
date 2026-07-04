@@ -1,6 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "name": "amys-bydgoszcz-experience",
   "installCommand": "npm ci --prefix app",
   "buildCommand": "npm run build --prefix app",
   "outputDirectory": "app/dist"
