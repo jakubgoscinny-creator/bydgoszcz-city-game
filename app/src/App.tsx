@@ -5,6 +5,7 @@ import { installSyncTriggers } from './lib/supabaseSync'
 import { SwipeDeck } from './components/SwipeDeck'
 import { StopCard } from './components/StopCard'
 import {
+  AttractionsPanel,
   FoodPanel,
   GarbaryPanel,
   HowItWorksPanel,
@@ -206,6 +207,7 @@ function App() {
         {panel === 'tips' ? <TipsPanel onClose={() => setPanel(null)} /> : null}
         {panel === 'garbary' ? <GarbaryPanel onClose={() => setPanel(null)} /> : null}
         {panel === 'food' ? <FoodPanel onClose={() => setPanel(null)} /> : null}
+        {panel === 'attractions' ? <AttractionsPanel onClose={() => setPanel(null)} /> : null}
         {panel === 'keepsake' ? <KeepsakePanel onClose={() => setPanel(null)} /> : null}
       </div>
     </ReactionsContext.Provider>

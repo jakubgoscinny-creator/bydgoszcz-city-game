@@ -15,6 +15,8 @@ export const tipId = (slug: string) => `tip:${slug}`
 
 export const garbaryId = (sectionId: string) => `garbary:${sectionId}`
 
+export const attractionId = (slug: string) => `attraction:${slug}`
+
 export const familyPhotoId = (photoId: string) => `familyPhoto:${photoId}`
 
 export const familyVoiceId = (voiceId: string) => `familyVoice:${voiceId}`

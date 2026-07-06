@@ -150,14 +150,17 @@ export const routeStops: RouteStop[] = [
       'low footbridges linking the island edges',
       'old brick buildings mirrored in the canal',
       'the family-friendly lawns and playground',
+      'the round, shiny rings of Opera Nova across the water',
     ],
     kidFacts: [
       'Mill Island feels like a secret park hidden in the middle of town, with bridges that almost turn the route into a hop-and-skip game.',
       'The central part of the island even has a playground, so little walkers get a real reset instead of only another monument.',
+      'That gleaming round building across the river is the Opera House — three giant circles stacked together, and it took 34 years to build. Some buildings are just very slow dancers.',
     ],
     adultFacts: [
       'The tourism route describes Mill Island as a green oasis in the city centre, lined with chestnuts, lindens, and willows planted in the 19th century.',
       "Before it became a leisure icon, this area was an industrial workhorse with mills, granaries, and even the royal mint tied to the city's river economy.",
+      'Opera Nova, the three-ring landmark on the far bank (begun 1973, opened 2006 — one of the longest theatre builds in post-war Poland), anchors the island\'s best skyline view; a footbridge links it straight to the island. A fourth ring with a free public viewing terrace is due to open during 2026.',
     ],
     mission: 'Count how many bridges you can spot before you leave the island behind.',
     bonus:
@@ -173,13 +176,13 @@ export const routeStops: RouteStop[] = [
     },
     geoPosition: { lat: 53.1227908, lon: 17.9959977 },
     highlightPause: {
-      name: 'Mill Island lawns',
-      kind: 'Soft reset',
+      name: 'Pierogarnia Stary Młyn',
+      kind: 'Pierogi with a river view',
       summary:
-        'Use the grassy edges as a no-booking family breather before heading into the red-brick mill complex.',
-      mapQuery: 'Mill Island, Bydgoszcz, Poland',
-      sourceLabel: 'Mill Island source',
-      sourceUrl: 'https://visitbydgoszcz.pl/en/explore/what-to-see/1413-mill-island-in-bydgoszcz',
+        'Traditional handmade pierogi — boiled, baked, even sweet dessert ones — in an old-mill-themed room on the riverside facing the island (Poznańska 4/2). Opens daily at a very Polish 11:03.',
+      mapQuery: 'Pierogarnia Stary Młyn, Poznańska 4/2, Bydgoszcz, Poland',
+      sourceLabel: 'Pierogarnia Stary Młyn site',
+      sourceUrl: 'https://www.pierogarnie.com/en/restauracje/old-mill-bydgoszcz/',
     },
     deepDive: {
       teaser:
@@ -352,13 +355,13 @@ export const routeStops: RouteStop[] = [
     },
     geoPosition: { lat: 53.1225128, lon: 18.0008557 },
     highlightPause: {
-      name: 'Sowa Cafe at 5 Mostowa',
-      kind: 'Optional sweet detour',
+      name: 'E. Wedel Pijalnia Czekolady',
+      kind: 'The chocolate stop',
       summary:
-        'The official specialties page points to Sowa Cafe on Mostowa as a place for house coffee and old Bydgoszcz photo reprints.',
-      mapQuery: 'Sowa Cafe Mostowa 5, Bydgoszcz, Poland',
-      sourceLabel: 'Bydgoszcz specialties source',
-      sourceUrl: 'https://visitbydgoszcz.pl/en/discover/2387-bydgoszcz-specialties',
+        "Poland's heritage chocolate maker runs a proper chocolate lounge right here at Mostowa 3 — thick drinking chocolate, hand-made pralines, and cakes, two minutes from the bridge.",
+      mapQuery: 'E. Wedel Pijalnia Czekolady, Mostowa 3, Bydgoszcz, Poland',
+      sourceLabel: 'Wedel Pijalnie official site',
+      sourceUrl: 'https://wedelpijalnie.pl/',
     },
     deepDive: {
       teaser:

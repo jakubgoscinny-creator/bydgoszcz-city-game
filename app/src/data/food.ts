@@ -46,6 +46,34 @@ export const foodPlaces: FoodPlace[] = [
     sourceUrl: 'https://katarynkabydgoszcz.pl/',
   },
   {
+    slug: 'pierogarnia-stary-mlyn',
+    name: 'Pierogarnia Stary Młyn',
+    address: 'ul. Poznańska 4/2',
+    kind: 'Traditional pierogi',
+    summary:
+      'Handmade pierogi the proper Polish way — boiled, baked, veggie, and sweet dessert varieties — served in a rustic old-mill room with timber beams and windows looking over the Brda toward Mill Island.',
+    familyNote:
+      'The most Polish meal of the trip, one riverside street from the island. Sweet pierogi with cream are a dependable kid win.',
+    hoursNote: 'Opens daily at 11:03 (yes, really); closes around 20:56 Sun–Thu, later Fri–Sat.',
+    nearStopId: 'mill-island',
+    mapQuery: 'Pierogarnia Stary Młyn, Poznańska 4/2, Bydgoszcz, Poland',
+    sourceUrl: 'https://www.pierogarnie.com/en/restauracje/old-mill-bydgoszcz/',
+  },
+  {
+    slug: 'wedel-pijalnia',
+    name: 'E. Wedel Pijalnia Czekolady',
+    address: 'ul. Mostowa 3',
+    kind: 'Chocolate lounge',
+    summary:
+      "The chocolate-drinking lounge of E. Wedel, Poland's heritage chocolate maker — thick hot (or cold) drinking chocolate, hand-made pralines, cakes, and pancakes, on the pedestrian street by the bridge.",
+    familyNote:
+      'Pure kid magnetism and a genuine Polish institution — the natural sweet stop on the Mostowa stretch of the walk.',
+    hoursNote: 'Open daily 10:00–21:00.',
+    nearStopId: 'mostowa',
+    mapQuery: 'E. Wedel Pijalnia Czekolady, Mostowa 3, Bydgoszcz, Poland',
+    sourceUrl: 'https://wedelpijalnie.pl/',
+  },
+  {
     slug: 'bromberg-kaffee',
     name: 'Bromberg Kaffee',
     address: 'ul. Gdańska 16',

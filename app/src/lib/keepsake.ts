@@ -9,6 +9,7 @@ import { foodPlaces } from '../data/food'
 import { foodPhotos } from '../data/foodPhotos'
 import { polandTips } from '../data/tips'
 import { garbarySections, garbaryPhoto } from '../data/garbary'
+import { attractions } from '../data/attractions'
 import {
   getVisitorLabel,
   loadAllPhotos,
@@ -115,6 +116,16 @@ function describeContentId(contentId: string): {
     }
     const section = garbarySections.find((s) => s.id === parts[1])
     return { order: 8000, title: `Garbary: ${section?.title ?? parts[1]}`, detail: '' }
+  }
+  if (parts[0] === 'attraction') {
+    const attraction = attractions.find((a) => a.slug === parts[1])
+    const eventName = parts[1].startsWith('event-') ? parts[1].replace(/^event-/, '').replace(/-/g, ' ') : null
+    return {
+      order: 8500,
+      title: `Beyond the trail: ${attraction?.name ?? eventName ?? parts[1]}`,
+      detail: '',
+      imageSrc: parts[2] === 'photo' ? attraction?.photo?.src : undefined,
+    }
   }
   if (parts[0] === 'familyPhoto') {
     return { order: 9000, title: 'A photo your family took', detail: '' }

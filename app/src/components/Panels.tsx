@@ -9,14 +9,15 @@ import {
   garbaryPhotoCredit,
   garbaryPhotoCreditUrl,
 } from '../data/garbary'
-import { foodId, garbaryId, tipId } from '../lib/contentIds'
+import { attractionId, foodId, garbaryId, tipId } from '../lib/contentIds'
 import { foodPhotos } from '../data/foodPhotos'
+import { attractions, visitEvents } from '../data/attractions'
 import { useReactions } from '../hooks/useReactions'
 import { ReactionDot } from './ReactionDot'
 import { StopPhoto } from './StopPhoto'
 import { downloadKeepsake, entryMarks, gatherKeepsakeEntries } from '../lib/keepsake'
 
-export type PanelId = 'howto' | 'tips' | 'garbary' | 'food' | 'keepsake' | null
+export type PanelId = 'howto' | 'tips' | 'garbary' | 'food' | 'attractions' | 'keepsake' | null
 
 type SheetProps = {
   title: string
@@ -83,7 +84,7 @@ const howItWorks = [
   {
     emoji: '🧳',
     title: 'In the menu',
-    body: 'The ☰ button up top holds the rest of the kit. "Good to know" — practical Poland tips for the week, from złoty maths to Sunday shop hours. "Your Street: Garbary" — the surprising history of the street you sleep on. "Where to eat" — real, checked places to refuel near the route. "Your keepsake" — everything you\'ve marked so far, gathered in one place.',
+    body: 'The ☰ button up top holds the rest of the kit. "Good to know" — practical Poland tips for the week, from złoty maths to Sunday shop hours. "Your Street: Garbary" — the surprising history of the street you sleep on. "Where to eat" — real, checked places to refuel near the route. "Notable attractions" — the bigger Bydgoszcz outings beyond the walk. "Your keepsake" — everything you\'ve marked so far, gathered in one place.',
   },
   {
     emoji: '📔',
@@ -253,6 +254,86 @@ function FoodCard({ place }: { place: (typeof foodPlaces)[number] }) {
   )
 }
 
+export function AttractionsPanel({ onClose }: { onClose: () => void }) {
+  return (
+    <Sheet title="Notable attractions" kicker="Beyond the trail" onClose={onClose}>
+      <p className="sheet-intro">
+        The walking route is half a day — these are the bigger Bydgoszcz cards to play with the
+        rest of the visit. All real, all checked.
+      </p>
+      {attractions.map((attraction) => (
+        <section className="food-card" key={attraction.slug}>
+          {attraction.photo ? (
+            <>
+              <StopPhoto
+                contentId={`${attractionId(attraction.slug)}:photo`}
+                src={attraction.photo.src}
+                alt={attraction.photo.alt}
+                notePlaceholder="worth the detour…"
+              />
+              {attraction.photo.credit ? (
+                <p className="photo-credit">
+                  <a href={attraction.photo.creditUrl} target="_blank" rel="noreferrer">
+                    {attraction.photo.credit}
+                  </a>
+                </p>
+              ) : null}
+            </>
+          ) : null}
+          <div className="food-card-head">
+            <p className="food-kind">{attraction.kind}</p>
+            <h3>{attraction.name}</h3>
+          </div>
+          {attraction.summary.map((para, i) => (
+            <p className={i === attraction.summary.length - 1 ? 'fact-line' : 'food-family-note'} key={i}>
+              {para}
+              {i === attraction.summary.length - 1 ? (
+                <ReactionDot
+                  contentId={attractionId(attraction.slug)}
+                  notePlaceholder="worth the detour…"
+                />
+              ) : null}
+            </p>
+          ))}
+          {attraction.practicalNote ? <p className="food-hours">{attraction.practicalNote}</p> : null}
+          <div className="food-links">
+            <a
+              className="text-link"
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(attraction.mapQuery)}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Find it on the map
+            </a>
+          </div>
+        </section>
+      ))}
+
+      {visitEvents.length ? (
+        <>
+          <h3 className="food-divider">While you&apos;re here — 9 to 12 July</h3>
+          {visitEvents.map((event) => (
+            <section className="food-card" key={event.name}>
+              <div className="food-card-head">
+                <p className="food-kind">{event.dates}</p>
+                <h3>{event.name}</h3>
+                <p className="food-address">{event.venue}</p>
+              </div>
+              <p className="fact-line">
+                {event.note}
+                <ReactionDot
+                  contentId={attractionId(`event-${event.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`)}
+                  notePlaceholder="are we going…"
+                />
+              </p>
+            </section>
+          ))}
+        </>
+      ) : null}
+    </Sheet>
+  )
+}
+
 export function KeepsakePanel({ onClose }: { onClose: () => void }) {
   const { reactions, photos, photoUrls, voiceUrls, visitorLabel, setVisitorLabel } = useReactions()
   const [busy, setBusy] = useState(false)
@@ -413,6 +494,10 @@ export function TrailMenu({
           <button type="button" onClick={() => onOpenPanel('food')}>
             <span className="menu-emoji" aria-hidden="true">🍦</span> Where to eat
             <small>verified picks near the route</small>
+          </button>
+          <button type="button" onClick={() => onOpenPanel('attractions')}>
+            <span className="menu-emoji" aria-hidden="true">🎡</span> Notable attractions
+            <small>beyond the walking route</small>
           </button>
           <button type="button" onClick={() => onOpenPanel('keepsake')}>
             <span className="menu-emoji" aria-hidden="true">📔</span> Your keepsake
