@@ -296,7 +296,23 @@ export function AttractionsPanel({ onClose }: { onClose: () => void }) {
             </p>
           ))}
           {attraction.practicalNote ? <p className="food-hours">{attraction.practicalNote}</p> : null}
-          <div className="food-links">
+          {attraction.gettingThere ? (
+            <p className="getting-there">
+              <span className="getting-there-label">Getting there</span>
+              {attraction.gettingThere}
+            </p>
+          ) : null}
+          <div className="food-links attraction-links">
+            {(attraction.links ?? []).map((link) => (
+              <a
+                key={link.url}
+                className="text-link"
+                href={link.url}
+                {...(link.url.startsWith('mailto:') ? {} : { target: '_blank', rel: 'noreferrer' })}
+              >
+                {link.label}
+              </a>
+            ))}
             <a
               className="text-link"
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(attraction.mapQuery)}`}
@@ -313,7 +329,24 @@ export function AttractionsPanel({ onClose }: { onClose: () => void }) {
         <>
           <h3 className="food-divider">While you&apos;re here — 9 to 12 July</h3>
           {visitEvents.map((event) => (
-            <section className="food-card" key={event.name}>
+            <section className="food-card" key={event.slug}>
+              {event.photo ? (
+                <>
+                  <StopPhoto
+                    contentId={`${attractionId(`event-${event.slug}`)}:photo`}
+                    src={event.photo.src}
+                    alt={event.photo.alt}
+                    notePlaceholder="are we going…"
+                  />
+                  {event.photo.credit ? (
+                    <p className="photo-credit">
+                      <a href={event.photo.creditUrl} target="_blank" rel="noreferrer">
+                        {event.photo.credit}
+                      </a>
+                    </p>
+                  ) : null}
+                </>
+              ) : null}
               <div className="food-card-head">
                 <p className="food-kind">{event.dates}</p>
                 <h3>{event.name}</h3>
@@ -322,10 +355,24 @@ export function AttractionsPanel({ onClose }: { onClose: () => void }) {
               <p className="fact-line">
                 {event.note}
                 <ReactionDot
-                  contentId={attractionId(`event-${event.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`)}
+                  contentId={attractionId(`event-${event.slug}`)}
                   notePlaceholder="are we going…"
                 />
               </p>
+              {(event.details ?? []).map((para, i) => (
+                <p className="food-family-note" key={i}>
+                  {para}
+                </p>
+              ))}
+              {event.links?.length ? (
+                <div className="food-links attraction-links">
+                  {event.links.map((link) => (
+                    <a key={link.url} className="text-link" href={link.url} target="_blank" rel="noreferrer">
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              ) : null}
             </section>
           ))}
         </>

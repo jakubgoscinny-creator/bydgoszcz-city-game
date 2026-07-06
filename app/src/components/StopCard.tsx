@@ -70,6 +70,9 @@ export function StopCard({ stop, index, total, nextStop, isActive, showDotHint, 
             <span className="deep-dive-hook">
               A chimney that moved house, and the man who cracked Enigma — the story of Garbary →
             </span>
+            <span className="garbary-teaser-hint">
+              Walking in from Garbary? Take the riverside promenade — the Brda leads you straight here.
+            </span>
           </button>
         ) : null}
 

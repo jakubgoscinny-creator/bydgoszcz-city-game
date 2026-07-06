@@ -84,7 +84,7 @@ export const garbarySections: GarbarySection[] = [
     id: 'walk',
     title: 'From your doorstep',
     body: [
-      'The Old Town and Mill Island are a short walk along the river from Garbary — roughly ten to twenty minutes of riverside strolling, which is exactly where the treasure trail begins.',
+      'The Old Town and Mill Island are a short walk from Garbary — and the way to go is the riverside promenade: follow the Brda downstream along the water and it leads you straight to the island, the mills, and the square in roughly fifteen minutes. Prettier than the street route, and no roads to cross with small legs.',
       'But don\'t rush off without giving your own street a proper look first.',
     ],
   },
